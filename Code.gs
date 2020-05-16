@@ -126,6 +126,7 @@ function findHourSlots(calendarDay){
 
 function getCalendarDays() { 
   let calendarDays = [];
+  // Number of days forward to look is defined here
   for (let i = 0; i < 14; i++) {
     let calendarDay = {};
 
@@ -150,3 +151,43 @@ function getCalendarDays() {
   return calendarDays; 
 }
 
+// Example input: [11.0, 11.25, 11.5, 11.75, 12.0, 12.25, 12.5, 12.75, 13.0, 13.25, 13.5, 13.75]
+function formatSlots(validStartTimes){
+  let formattedString = "";
+  for (let i = 0; i < validStartTimes.length; i++) {
+      if (i === 0) {
+        formattedString = formattedString + validStartTimes[0];
+        formattedString = formattedString + "-";
+      }
+      if (validStartTimes[i + 1] - validStartTimes[i] != 0.25) {
+        if (i !== validStartTimes.length - 1) {
+          formattedString = formattedString + (validStartTimes[i] + 1);
+          formattedString = formattedString + ", " + validStartTimes[i + 1] + "-";  
+        }
+        else {
+          formattedString = formattedString + (validStartTimes[i] + 1);
+        }
+      }
+  }
+  return formattedString;
+}
+
+// Creates email drafts, ccing the appropriate parties
+function createDraft(email, calendarDays) {
+  let msg = "";
+  
+  for (let i = 0; i < calendarDays.length; i++) {
+    let month = calendarDays[i].month + 1;
+    let date = calendarDays[i].date;
+    let dayOfWeek = calendarDays[i].dayOfWeek;
+    let formattedSlots = formatSlots(calendarDays[i].validStartTimes);
+    
+    let oneDay = month + "/" + date + " (" + getDayOfWeekName(dayOfWeek) + "): " + formattedSlots + "\n";
+    msg += oneDay;
+  }
+  GmailApp.createDraft(email, "Rescheduling", msg);
+}
+
+function main() {
+  createDraft("akutsu.yoshi@gmail.com", getCalendarDays());
+}
