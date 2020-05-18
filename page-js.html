@@ -20,12 +20,11 @@
     let shiftDay = new Date(day);
     shiftDay.setDate(day.getDate() + shift);
     displayDay = shiftDay;
-    printDates(shiftDay);
+    printDates(displayDay);
   }
 
   function getRelativeDate(day, shift) {
-    let shiftedDay = new Date();
-    shiftedDay.setDate(day.getDate() + shift);
+    let shiftedDay = new Date(day.getTime() + 24 * shift * 60 * 60 * 1000);
     return shiftedDay.getMonth() + 1 + "/" + shiftedDay.getDate();
   }
 
@@ -38,26 +37,24 @@
     const saturday = document.getElementById("sat");
     const sunday = document.getElementById("sun");
 
-    let today = date;
-
-    switch (today.getDay()) {
+    switch (date.getDay()) {
       case 0:
-        sunday.textContent = today.getMonth() + 1 + "/" + today.getDate();
-        monday.textContent = getRelativeDate(today, 1);
-        tuesday.textContent = getRelativeDate(today, 2);
-        wednesday.textContent = getRelativeDate(today, 3);
-        thursday.textContent = getRelativeDate(today, 4);
-        friday.textContent = getRelativeDate(today, 5);
-        saturday.textContent = getRelativeDate(today, 6);
+        sunday.textContent = date.getMonth() + 1 + "/" + today.getDate();
+        monday.textContent = getRelativeDate(date, 1);
+        tuesday.textContent = getRelativeDate(date, 2);
+        wednesday.textContent = getRelativeDate(date, 3);
+        thursday.textContent = getRelativeDate(date, 4);
+        friday.textContent = getRelativeDate(date, 5);
+        saturday.textContent = getRelativeDate(date, 6);
         break;
       case 1:
-        sunday.textContent = getRelativeDate(today, -1);
-        monday.textContent = today.getMonth() + 1 + "/" + today.getDate();
-        tuesday.textContent = getRelativeDate(today, 1);
-        wednesday.textContent = getRelativeDate(today, 2);
-        thursday.textContent = getRelativeDate(today, 3);
-        friday.textContent = getRelativeDate(today, 4);
-        saturday.textContent = getRelativeDate(today, 5);
+        sunday.textContent = getRelativeDate(date, -1);
+        monday.textContent = date.getMonth() + 1 + "/" + date.getDate();
+        tuesday.textContent = getRelativeDate(date, 1);
+        wednesday.textContent = getRelativeDate(date, 2);
+        thursday.textContent = getRelativeDate(date, 3);
+        friday.textContent = getRelativeDate(date, 4);
+        saturday.textContent = getRelativeDate(date, 5);
         break;
       case 2:
         sunday.textContent = getRelativeDate(today, -2);
