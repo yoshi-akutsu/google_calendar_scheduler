@@ -1,0 +1,11 @@
+<script>
+  google.script.run.withSuccessHandler(printAvailability).getCalendarDays();
+
+  function printDay(calendarDay) {}
+
+  function printAvailability(calendarDays) {
+    for (let i = 0; i < calendarDays.length; i++) {
+      console.log(calendarDays[i].validStartTimes);
+    }
+  }
+</script>

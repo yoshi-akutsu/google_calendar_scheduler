@@ -123,6 +123,10 @@ function findHourSlots(calendarDay){
   return validStartTimes;
 }
 
+function getNumberOfDaysForward() {
+  
+}
+
 
 function getCalendarDays() { 
   let calendarDays = [];
@@ -151,21 +155,47 @@ function getCalendarDays() {
   return calendarDays; 
 }
 
+function decimalToMinutes(number) {
+  let decimal = number - Math.floor(number);
+  if (decimal == 0) return number;
+  if (decimal == 0.5) return (Math.floor(number) + ":30");
+  if (decimal == 0.25) return (Math.floor(number) + ":15");
+  if (decimal == 0.75) return (Math.floor(number) + ":45");
+}
+
+function militaryToTwelveHour(militaryHour) {
+  if (militaryHour > 12) {
+    let twelveHour = militaryHour - 12;
+    twelveHour = decimalToMinutes(twelveHour) + "pm";
+    return twelveHour;
+  }
+  else if (militaryHour == 12) {
+    let twelveHour = militaryHour;
+    twelveHour = decimalToMinutes(twelveHour) + "pm";
+    return twelveHour;
+  }
+  else {
+    let twelveHour = militaryHour;
+    twelveHour = decimalToMinutes(twelveHour) + "am";
+    return twelveHour;
+  }
+}
+
 // Example input: [11.0, 11.25, 11.5, 11.75, 12.0, 12.25, 12.5, 12.75, 13.0, 13.25, 13.5, 13.75]
 function formatSlots(validStartTimes){
   let formattedString = "";
   for (let i = 0; i < validStartTimes.length; i++) {
       if (i === 0) {
-        formattedString = formattedString + validStartTimes[0];
+        formattedString = formattedString + militaryToTwelveHour(validStartTimes[0]);
         formattedString = formattedString + "-";
       }
       if (validStartTimes[i + 1] - validStartTimes[i] != 0.25) {
         if (i !== validStartTimes.length - 1) {
-          formattedString = formattedString + (validStartTimes[i] + 1);
-          formattedString = formattedString + ", " + validStartTimes[i + 1] + "-";  
+          formattedString = formattedString + militaryToTwelveHour((validStartTimes[i] + 1));
+          formattedString = formattedString + ", " + militaryToTwelveHour(validStartTimes[i + 1]) + "-";  
         }
         else {
-          formattedString = formattedString + (validStartTimes[i] + 1);
+          formattedString = formattedString + militaryToTwelveHour((validStartTimes[i] + 1));
         }
       }
   }
