@@ -1,11 +1,120 @@
 <script>
-  google.script.run.withSuccessHandler(printAvailability).getCalendarDays();
+  let displayDay = new Date();
+  printDates(displayDay);
+  google.script.run.withSuccessHandler(printUnavailability).getCalendarDays();
+  toggleCells();
 
-  function printDay(calendarDay) {}
+  const next = document.getElementById("next");
+  const prev = document.getElementById("prev");
 
-  function printAvailability(calendarDays) {
-    for (let i = 0; i < calendarDays.length; i++) {
-      console.log(calendarDays[i].validStartTimes);
+  prev.addEventListener("click", () => {
+    shiftDates(displayDay, -7);
+  });
+
+  next.addEventListener("click", () => {
+    shiftDates(displayDay, 7);
+  });
+
+  function shiftDates(day, shift) {
+    console.log("clicked");
+    let shiftDay = new Date(day);
+    shiftDay.setDate(day.getDate() + shift);
+    displayDay = shiftDay;
+    printDates(shiftDay);
+  }
+
+  function getRelativeDate(day, shift) {
+    let shiftedDay = new Date();
+    shiftedDay.setDate(day.getDate() + shift);
+    return shiftedDay.getMonth() + 1 + "/" + shiftedDay.getDate();
+  }
+
+  function printDates(date) {
+    const monday = document.getElementById("mon");
+    const tuesday = document.getElementById("tue");
+    const wednesday = document.getElementById("wed");
+    const thursday = document.getElementById("thu");
+    const friday = document.getElementById("fri");
+    const saturday = document.getElementById("sat");
+    const sunday = document.getElementById("sun");
+
+    let today = date;
+
+    switch (today.getDay()) {
+      case 0:
+        sunday.textContent = today.getMonth() + 1 + "/" + today.getDate();
+        monday.textContent = getRelativeDate(today, 1);
+        tuesday.textContent = getRelativeDate(today, 2);
+        wednesday.textContent = getRelativeDate(today, 3);
+        thursday.textContent = getRelativeDate(today, 4);
+        friday.textContent = getRelativeDate(today, 5);
+        saturday.textContent = getRelativeDate(today, 6);
+        break;
+      case 1:
+        sunday.textContent = getRelativeDate(today, -1);
+        monday.textContent = today.getMonth() + 1 + "/" + today.getDate();
+        tuesday.textContent = getRelativeDate(today, 1);
+        wednesday.textContent = getRelativeDate(today, 2);
+        thursday.textContent = getRelativeDate(today, 3);
+        friday.textContent = getRelativeDate(today, 4);
+        saturday.textContent = getRelativeDate(today, 5);
+        break;
+      case 2:
+        sunday.textContent = getRelativeDate(today, -2);
+        monday.textContent = getRelativeDate(today, -1);
+        tuesday.textContent = today.getMonth() + 1 + "/" + today.getDate();
+        wednesday.textContent = getRelativeDate(today, 1);
+        thursday.textContent = getRelativeDate(today, 2);
+        friday.textContent = getRelativeDate(today, 3);
+        saturday.textContent = getRelativeDate(today, 4);
+        break;
+      case 3:
+        sunday.textContent = getRelativeDate(today, -3);
+        monday.textContent = getRelativeDate(today, -2);
+        tuesday.textContent = getRelativeDate(today, -1);
+        wednesday.textContent = today.getMonth() + 1 + "/" + today.getDate();
+        thursday.textContent = getRelativeDate(today, 1);
+        friday.textContent = getRelativeDate(today, 2);
+        saturday.textContent = getRelativeDate(today, 3);
+        break;
+      case 4:
+        sunday.textContent = getRelativeDate(today, -4);
+        monday.textContent = getRelativeDate(today, -3);
+        tuesday.textContent = getRelativeDate(today, -2);
+        wednesday.textContent = getRelativeDate(today, -1);
+        thursday.textContent = today.getMonth() + 1 + "/" + today.getDate();
+        friday.textContent = getRelativeDate(today, 1);
+        saturday.textContent = getRelativeDate(today, 2);
+        break;
+      case 5:
+        sunday.textContent = getRelativeDate(today, -5);
+        monday.textContent = getRelativeDate(today, -4);
+        tuesday.textContent = getRelativeDate(today, -3);
+        wednesday.textContent = getRelativeDate(today, -2);
+        thursday.textContent = getRelativeDate(today, -1);
+        friday.textContent = today.getMonth() + 1 + "/" + today.getDate();
+        saturday.textContent = getRelativeDate(today, 1);
+        break;
+      case 6:
+        sunday.textContent = getRelativeDate(today, -6);
+        monday.textContent = getRelativeDate(today, -5);
+        tuesday.textContent = getRelativeDate(today, -4);
+        wednesday.textContent = getRelativeDate(today, -3);
+        thursday.textContent = getRelativeDate(today, -2);
+        friday.textContent = getRelativeDate(today, -1);
+        saturday.textContent = today.getMonth() + 1 + "/" + today.getDate();
+        break;
     }
+  }
+
+  function printUnavailability(calendarDays) {}
+
+  function toggleCells() {
+    const cells = document.querySelectorAll("td");
+    cells.forEach((cell) => {
+      cell.addEventListener("click", () => {
+        console.log(cell.id);
+      });
+    });
   }
 </script>
