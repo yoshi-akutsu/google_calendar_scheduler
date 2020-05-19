@@ -17,6 +17,9 @@
         <button id="next">Next</button>
       </div>
       <div class="calendar-body">
+        <div class="alert alert-success" role="alert" style="display: none;">
+          Event successfully scheduled!
+        </div>
         <table>
           <thead>
             <tr>
@@ -460,9 +463,7 @@
           <label for="powell">Powell</label>
           <button class="btn" style="display: none;"></button>
         </form>
-        <button id="submit" onclick="handleSubmission()" class="btn">
-          Confirm
-        </button>
+        <button id="submit" class="btn">Confirm</button>
         <button class="btn cancel" onclick="closeForm()">Cancel</button>
       </div>
     </div>

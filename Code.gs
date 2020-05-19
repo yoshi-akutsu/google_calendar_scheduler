@@ -221,3 +221,14 @@ function createDraft(email, calendarDays) {
 function main() {
   createDraft("akutsu.yoshi@gmail.com", getCalendarDays());
 }
+
+function createCalendarEvent(obj) {
+  let date = new Date(obj.date[0], obj.date[1], obj.date[2], obj.date[3]);
+  let endDate = new Date(date);
+  endDate.setHours(date.getHours() + 1);
+  
+  let title = obj.location + obj.fullName;
+  Logger.log(date, endDate, title);
+  let event = CalendarApp.getDefaultCalendar().createEvent(title, date, endDate, {guests: obj.email, sendInvites: true});
+
+}
