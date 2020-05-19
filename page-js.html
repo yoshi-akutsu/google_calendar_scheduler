@@ -1,22 +1,75 @@
 <script>
   let displayDay = new Date();
   printDates(displayDay);
-  google.script.run.withSuccessHandler(printUnavailability).getCalendarDays();
+  let page = 0;
+  google.script.run.withSuccessHandler(printAvailability).getCalendarDays();
   toggleCells();
+
+  let globalCalendarDays;
 
   const next = document.getElementById("next");
   const prev = document.getElementById("prev");
 
   prev.addEventListener("click", () => {
     shiftDates(displayDay, -7);
+    grayCells();
+    page -= 1;
+    printAvailability(globalCalendarDays);
   });
 
   next.addEventListener("click", () => {
     shiftDates(displayDay, 7);
+    grayCells();
+    page += 1;
+    printAvailability(globalCalendarDays);
   });
 
+  const mapping = {
+    "10": 0,
+    "10.25": 1,
+    "10.5": 2,
+    "10.75": 3,
+    "11": 4,
+    "11.25": 5,
+    "11.5": 6,
+    "11.75": 7,
+    "12": 8,
+    "12.25": 9,
+    "12.5": 10,
+    "12.75": 11,
+    "13": 12,
+    "13.25": 13,
+    "13.5": 14,
+    "13.75": 15,
+    "14": 16,
+    "14.25": 17,
+    "14.5": 18,
+    "14.75": 19,
+    "15": 20,
+    "15.25": 21,
+    "15.5": 22,
+    "15.75": 23,
+    "16": 24,
+    "16.25": 25,
+    "16.5": 26,
+    "16.75": 27,
+    "17": 28,
+    "17.25": 29,
+    "17.5": 30,
+    "17.75": 31,
+    "18": 32,
+    "18.25": 33,
+    "18.5": 34,
+    "18.75": 35,
+    "19": 36,
+    "19.25": 37,
+    "19.5": 38,
+    "19.75": 39,
+  };
+
+  // Start functions
+
   function shiftDates(day, shift) {
-    console.log("clicked");
     let shiftDay = new Date(day);
     shiftDay.setDate(day.getDate() + shift);
     displayDay = shiftDay;
@@ -104,7 +157,196 @@
     }
   }
 
-  function printUnavailability(calendarDays) {}
+  function printOneDay(dayOfWeek, availableTimes) {
+    switch (dayOfWeek) {
+      case 0:
+        for (let i = 0; i < availableTimes.length; i++) {
+          if (availableTimes[i] in mapping) {
+            let cell = document.getElementById(mapping[availableTimes[i]]);
+            let cell2 = document.getElementById(mapping[availableTimes[i]] + 1);
+            let cell3 = document.getElementById(mapping[availableTimes[i]] + 2);
+            let cell4 = document.getElementById(mapping[availableTimes[i]] + 3);
+
+            cell.classList.add("open");
+            cell2.classList.add("open");
+            cell3.classList.add("open");
+            cell4.classList.add("open");
+          }
+        }
+        break;
+      case 1:
+        for (let i = 0; i < availableTimes.length; i++) {
+          if (availableTimes[i] in mapping) {
+            let cell = document.getElementById(mapping[availableTimes[i]] + 40);
+            let cell2 = document.getElementById(
+              mapping[availableTimes[i]] + 41
+            );
+            let cell3 = document.getElementById(
+              mapping[availableTimes[i]] + 42
+            );
+            let cell4 = document.getElementById(
+              mapping[availableTimes[i]] + 43
+            );
+
+            cell.classList.add("open");
+            cell2.classList.add("open");
+            cell3.classList.add("open");
+            cell4.classList.add("open");
+          }
+        }
+        break;
+      case 2:
+        for (let i = 0; i < availableTimes.length; i++) {
+          if (availableTimes[i] in mapping) {
+            let cell = document.getElementById(mapping[availableTimes[i]] + 80);
+            let cell2 = document.getElementById(
+              mapping[availableTimes[i]] + 81
+            );
+            let cell3 = document.getElementById(
+              mapping[availableTimes[i]] + 82
+            );
+            let cell4 = document.getElementById(
+              mapping[availableTimes[i]] + 83
+            );
+
+            cell.classList.add("open");
+            cell2.classList.add("open");
+            cell3.classList.add("open");
+            cell4.classList.add("open");
+          }
+        }
+        break;
+      case 3:
+        for (let i = 0; i < availableTimes.length; i++) {
+          if (availableTimes[i] in mapping) {
+            let cell = document.getElementById(
+              mapping[availableTimes[i]] + 120
+            );
+            let cell2 = document.getElementById(
+              mapping[availableTimes[i]] + 121
+            );
+            let cell3 = document.getElementById(
+              mapping[availableTimes[i]] + 122
+            );
+            let cell4 = document.getElementById(
+              mapping[availableTimes[i]] + 123
+            );
+
+            cell.classList.add("open");
+            cell2.classList.add("open");
+            cell3.classList.add("open");
+            cell4.classList.add("open");
+          }
+        }
+        break;
+      case 4:
+        for (let i = 0; i < availableTimes.length; i++) {
+          if (availableTimes[i] in mapping) {
+            let cell = document.getElementById(
+              mapping[availableTimes[i]] + 160
+            );
+            let cell2 = document.getElementById(
+              mapping[availableTimes[i]] + 161
+            );
+            let cell3 = document.getElementById(
+              mapping[availableTimes[i]] + 162
+            );
+            let cell4 = document.getElementById(
+              mapping[availableTimes[i]] + 163
+            );
+
+            cell.classList.add("open");
+            cell2.classList.add("open");
+            cell3.classList.add("open");
+            cell4.classList.add("open");
+          }
+        }
+        break;
+      case 5:
+        for (let i = 0; i < availableTimes.length; i++) {
+          if (availableTimes[i] in mapping) {
+            let cell = document.getElementById(
+              mapping[availableTimes[i]] + 200
+            );
+            let cell2 = document.getElementById(
+              mapping[availableTimes[i]] + 201
+            );
+            let cell3 = document.getElementById(
+              mapping[availableTimes[i]] + 202
+            );
+            let cell4 = document.getElementById(
+              mapping[availableTimes[i]] + 203
+            );
+
+            cell.classList.add("open");
+            cell2.classList.add("open");
+            cell3.classList.add("open");
+            cell4.classList.add("open");
+          }
+        }
+        break;
+      case 6:
+        for (let i = 0; i < availableTimes.length; i++) {
+          if (availableTimes[i] in mapping) {
+            let cell = document.getElementById(mapping[availableTimes[i]] + 80);
+            let cell2 = document.getElementById(
+              mapping[availableTimes[i]] + 81
+            );
+            let cell3 = document.getElementById(
+              mapping[availableTimes[i]] + 82
+            );
+            let cell4 = document.getElementById(
+              mapping[availableTimes[i]] + 83
+            );
+
+            cell.classList.add("open");
+            cell2.classList.add("open");
+            cell3.classList.add("open");
+            cell4.classList.add("open");
+          }
+        }
+        break;
+    }
+  }
+
+  function findMonday(days) {
+    for (let i = 0; i < days.length; i++) {
+      if (days[i].dayOfWeek == 1) {
+        return i;
+      }
+    }
+  }
+
+  function printAvailability(calendarDays) {
+    globalCalendarDays = calendarDays;
+    let firstMonday = findMonday(calendarDays);
+
+    if (page === 0) {
+      let numLoops = 6 - calendarDays[0].dayOfWeek;
+      for (let i = 0; i < numLoops; i++) {
+        printOneDay(calendarDays[i].dayOfWeek, calendarDays[i].validStartTimes);
+      }
+    } else if (page < 0) {
+      grayCells();
+    } else if (page === 1) {
+      if (firstMonday === 0) {
+        firstMonday = 5;
+      }
+      for (let i = 0; i < 5; i++) {
+        printOneDay(
+          calendarDays[i + firstMonday].dayOfWeek,
+          calendarDays[i + firstMonday].validStartTimes
+        );
+      }
+    } else {
+      grayCells();
+    }
+  }
+
+  function grayCells() {
+    const cells = document.querySelectorAll("td");
+    cells.forEach((cell) => cell.classList.remove("open"));
+  }
 
   function toggleCells() {
     const cells = document.querySelectorAll("td");
