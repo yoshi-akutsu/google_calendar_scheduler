@@ -92,7 +92,7 @@
 
     switch (date.getDay()) {
       case 0:
-        sunday.textContent = date.getMonth() + 1 + "/" + today.getDate();
+        sunday.textContent = date.getMonth() + 1 + "/" + date.getDate();
         monday.textContent = getRelativeDate(date, 1);
         tuesday.textContent = getRelativeDate(date, 2);
         wednesday.textContent = getRelativeDate(date, 3);
@@ -110,49 +110,49 @@
         saturday.textContent = getRelativeDate(date, 5);
         break;
       case 2:
-        sunday.textContent = getRelativeDate(today, -2);
-        monday.textContent = getRelativeDate(today, -1);
-        tuesday.textContent = today.getMonth() + 1 + "/" + today.getDate();
-        wednesday.textContent = getRelativeDate(today, 1);
-        thursday.textContent = getRelativeDate(today, 2);
-        friday.textContent = getRelativeDate(today, 3);
-        saturday.textContent = getRelativeDate(today, 4);
+        sunday.textContent = getRelativeDate(date, -2);
+        monday.textContent = getRelativeDate(date, -1);
+        tuesday.textContent = date.getMonth() + 1 + "/" + date.getDate();
+        wednesday.textContent = getRelativeDate(date, 1);
+        thursday.textContent = getRelativeDate(date, 2);
+        friday.textContent = getRelativeDate(date, 3);
+        saturday.textContent = getRelativeDate(date, 4);
         break;
       case 3:
-        sunday.textContent = getRelativeDate(today, -3);
-        monday.textContent = getRelativeDate(today, -2);
-        tuesday.textContent = getRelativeDate(today, -1);
-        wednesday.textContent = today.getMonth() + 1 + "/" + today.getDate();
-        thursday.textContent = getRelativeDate(today, 1);
-        friday.textContent = getRelativeDate(today, 2);
-        saturday.textContent = getRelativeDate(today, 3);
+        sunday.textContent = getRelativeDate(date, -3);
+        monday.textContent = getRelativeDate(date, -2);
+        tuesday.textContent = getRelativeDate(date, -1);
+        wednesday.textContent = date.getMonth() + 1 + "/" + date.getDate();
+        thursday.textContent = getRelativeDate(date, 1);
+        friday.textContent = getRelativeDate(date, 2);
+        saturday.textContent = getRelativeDate(date, 3);
         break;
       case 4:
-        sunday.textContent = getRelativeDate(today, -4);
-        monday.textContent = getRelativeDate(today, -3);
-        tuesday.textContent = getRelativeDate(today, -2);
-        wednesday.textContent = getRelativeDate(today, -1);
-        thursday.textContent = today.getMonth() + 1 + "/" + today.getDate();
-        friday.textContent = getRelativeDate(today, 1);
-        saturday.textContent = getRelativeDate(today, 2);
+        sunday.textContent = getRelativeDate(date, -4);
+        monday.textContent = getRelativeDate(date, -3);
+        tuesday.textContent = getRelativeDate(date, -2);
+        wednesday.textContent = getRelativeDate(date, -1);
+        thursday.textContent = date.getMonth() + 1 + "/" + date.getDate();
+        friday.textContent = getRelativeDate(date, 1);
+        saturday.textContent = getRelativeDate(date, 2);
         break;
       case 5:
-        sunday.textContent = getRelativeDate(today, -5);
-        monday.textContent = getRelativeDate(today, -4);
-        tuesday.textContent = getRelativeDate(today, -3);
-        wednesday.textContent = getRelativeDate(today, -2);
-        thursday.textContent = getRelativeDate(today, -1);
-        friday.textContent = today.getMonth() + 1 + "/" + today.getDate();
-        saturday.textContent = getRelativeDate(today, 1);
+        sunday.textContent = getRelativeDate(date, -5);
+        monday.textContent = getRelativeDate(date, -4);
+        tuesday.textContent = getRelativeDate(date, -3);
+        wednesday.textContent = getRelativeDate(date, -2);
+        thursday.textContent = getRelativeDate(date, -1);
+        friday.textContent = date.getMonth() + 1 + "/" + date.getDate();
+        saturday.textContent = getRelativeDate(date, 1);
         break;
       case 6:
-        sunday.textContent = getRelativeDate(today, -6);
-        monday.textContent = getRelativeDate(today, -5);
-        tuesday.textContent = getRelativeDate(today, -4);
-        wednesday.textContent = getRelativeDate(today, -3);
-        thursday.textContent = getRelativeDate(today, -2);
-        friday.textContent = getRelativeDate(today, -1);
-        saturday.textContent = today.getMonth() + 1 + "/" + today.getDate();
+        sunday.textContent = getRelativeDate(date, -6);
+        monday.textContent = getRelativeDate(date, -5);
+        tuesday.textContent = getRelativeDate(date, -4);
+        wednesday.textContent = getRelativeDate(date, -3);
+        thursday.textContent = getRelativeDate(date, -2);
+        friday.textContent = getRelativeDate(date, -1);
+        saturday.textContent = date.getMonth() + 1 + "/" + date.getDate();
         break;
     }
   }
@@ -341,19 +341,169 @@
     } else {
       grayCells();
     }
+    toggleCells();
   }
 
   function grayCells() {
     const cells = document.querySelectorAll("td");
-    cells.forEach((cell) => cell.classList.remove("open"));
+    cells.forEach((cell) => {
+      cell.classList.remove("open");
+      cell.classList.remove("highlight");
+    });
+  }
+
+  function decimalToMinutes(number) {
+    let decimal = number - Math.floor(number);
+    if (decimal == 0) return number;
+    if (decimal == 0.5) return Math.floor(number) + ":30";
+    if (decimal == 0.25) return Math.floor(number) + ":15";
+    if (decimal == 0.75) return Math.floor(number) + ":45";
+  }
+
+  function militaryToTwelveHour(militaryHour) {
+    console.log(militaryHour);
+    if (militaryHour > 13) {
+      let twelveHour = militaryHour - 12;
+      twelveHour = decimalToMinutes(twelveHour) + "pm";
+      return twelveHour;
+    } else if (militaryHour >= 12 && militaryHour < 13) {
+      let twelveHour = militaryHour;
+      twelveHour = decimalToMinutes(twelveHour) + "pm";
+      return twelveHour;
+    } else {
+      let twelveHour = militaryHour;
+      twelveHour = decimalToMinutes(twelveHour) + "am";
+      return twelveHour;
+    }
+  }
+
+  function fillEventDetails(id) {
+    const monday = document.getElementById("mon");
+    const tuesday = document.getElementById("tue");
+    const wednesday = document.getElementById("wed");
+    const thursday = document.getElementById("thu");
+    const friday = document.getElementById("fri");
+    const saturday = document.getElementById("sat");
+    const sunday = document.getElementById("sun");
+
+    const eventDetails = document.getElementById("eventDetails");
+    const timeOfEvent = document.getElementById("eventTime");
+    let eventTime;
+
+    if (id < 40) {
+      eventDetails.textContent = "Sunday " + sunday.textContent;
+      for (time in mapping) {
+        if (mapping[time] == id) eventTime = time;
+      }
+      timeOfEvent.textContent =
+        militaryToTwelveHour(eventTime) +
+        "-" +
+        militaryToTwelveHour(parseFloat(eventTime) + 1);
+    } else if (id < 80) {
+      eventDetails.textContent = "Monday " + monday.textContent;
+      for (time in mapping) {
+        if (mapping[time] == id - 40) eventTime = time;
+      }
+      timeOfEvent.textContent =
+        militaryToTwelveHour(eventTime) +
+        "-" +
+        militaryToTwelveHour(parseFloat(eventTime) + 1);
+    } else if (id < 120) {
+      console.log("Tuesday");
+      eventDetails.textContent = "Tuesday " + tuesday.textContent;
+      for (time in mapping) {
+        if (mapping[time] == id - 80) eventTime = time;
+      }
+      timeOfEvent.textContent =
+        militaryToTwelveHour(eventTime) +
+        "-" +
+        militaryToTwelveHour(parseFloat(eventTime) + 1);
+    } else if (id < 160) {
+      eventDetails.textContent = "Wednesday " + wednesday.textContent;
+      for (time in mapping) {
+        if (mapping[time] == id - 120) eventTime = time;
+      }
+      timeOfEvent.textContent =
+        militaryToTwelveHour(eventTime) +
+        "-" +
+        militaryToTwelveHour(parseFloat(eventTime) + 1);
+    } else if (id < 200) {
+      eventDetails.textContent = "Thursday " + thursday.textContent;
+      for (time in mapping) {
+        if (mapping[time] == id - 160) eventTime = time;
+      }
+      timeOfEvent.textContent =
+        militaryToTwelveHour(eventTime) +
+        "-" +
+        militaryToTwelveHour(parseFloat(eventTime) + 1);
+    } else if (id < 240) {
+      eventDetails.textContent = "Friday " + friday.textContent;
+      for (time in mapping) {
+        if (mapping[time] == id - 200) eventTime = time;
+      }
+      timeOfEvent.textContent =
+        militaryToTwelveHour(eventTime) +
+        "-" +
+        militaryToTwelveHour(parseFloat(eventTime) + 1);
+    } else if (id < 280) {
+      eventDetails.textContent = "Saturday " + saturday.textContent;
+      for (time in mapping) {
+        if (mapping[time] == id - 240) eventTime = time;
+      }
+      timeOfEvent.textContent =
+        militaryToTwelveHour(eventTime) +
+        "-" +
+        militaryToTwelveHour(parseFloat(eventTime) + 1);
+    }
   }
 
   function toggleCells() {
-    const cells = document.querySelectorAll("td");
+    const cells = document.querySelectorAll(".open");
     cells.forEach((cell) => {
       cell.addEventListener("click", () => {
-        console.log(cell.id);
+        if (cell.classList.contains("valid")) {
+          fillEventDetails(cell.id);
+          document.getElementById("popup-Form").style.display = "block";
+        }
+      });
+      cell.addEventListener("mouseover", () => {
+        let adjacentCell = document.getElementById(parseInt(cell.id) + 1);
+        let adjacentCell2 = document.getElementById(parseInt(cell.id) + 2);
+        let adjacentCell3 = document.getElementById(parseInt(cell.id) + 3);
+
+        if (
+          cell.classList.contains("open") &&
+          adjacentCell.classList.contains("open") &&
+          adjacentCell2.classList.contains("open") &&
+          adjacentCell3.classList.contains("open")
+        ) {
+          cell.classList.add("highlight");
+          cell.classList.add("valid");
+          adjacentCell.classList.add("highlight");
+          adjacentCell2.classList.add("highlight");
+          adjacentCell3.classList.add("highlight");
+        }
+      });
+      cell.addEventListener("mouseout", () => {
+        let adjacentCell = document.getElementById(parseInt(cell.id) + 1);
+        let adjacentCell2 = document.getElementById(parseInt(cell.id) + 2);
+        let adjacentCell3 = document.getElementById(parseInt(cell.id) + 3);
+        if (
+          cell.classList.contains("open") &&
+          adjacentCell.classList.contains("open") &&
+          adjacentCell2.classList.contains("open") &&
+          adjacentCell3.classList.contains("open")
+        ) {
+          cell.classList.remove("highlight");
+          adjacentCell.classList.remove("highlight");
+          adjacentCell2.classList.remove("highlight");
+          adjacentCell3.classList.remove("highlight");
+        }
       });
     });
+  }
+
+  function closeForm() {
+    document.getElementById("popup-Form").style.display = "none";
   }
 </script>
