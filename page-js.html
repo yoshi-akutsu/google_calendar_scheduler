@@ -1,509 +1,130 @@
-<script>
-  let displayDay = new Date();
-  printDates(displayDay);
-  let page = 0;
-  google.script.run.withSuccessHandler(printAvailability).getCalendarDays();
-  toggleCells();
-
-  let globalCalendarDays;
-
-  const next = document.getElementById("next");
-  const prev = document.getElementById("prev");
-
-  prev.addEventListener("click", () => {
-    shiftDates(displayDay, -7);
-    grayCells();
-    page -= 1;
-    printAvailability(globalCalendarDays);
-  });
-
-  next.addEventListener("click", () => {
-    shiftDates(displayDay, 7);
-    grayCells();
-    page += 1;
-    printAvailability(globalCalendarDays);
-  });
-
-  const mapping = {
-    "10": 0,
-    "10.25": 1,
-    "10.5": 2,
-    "10.75": 3,
-    "11": 4,
-    "11.25": 5,
-    "11.5": 6,
-    "11.75": 7,
-    "12": 8,
-    "12.25": 9,
-    "12.5": 10,
-    "12.75": 11,
-    "13": 12,
-    "13.25": 13,
-    "13.5": 14,
-    "13.75": 15,
-    "14": 16,
-    "14.25": 17,
-    "14.5": 18,
-    "14.75": 19,
-    "15": 20,
-    "15.25": 21,
-    "15.5": 22,
-    "15.75": 23,
-    "16": 24,
-    "16.25": 25,
-    "16.5": 26,
-    "16.75": 27,
-    "17": 28,
-    "17.25": 29,
-    "17.5": 30,
-    "17.75": 31,
-    "18": 32,
-    "18.25": 33,
-    "18.5": 34,
-    "18.75": 35,
-    "19": 36,
-    "19.25": 37,
-    "19.5": 38,
-    "19.75": 39,
-  };
-
-  // Start functions
-
-  function shiftDates(day, shift) {
-    let shiftDay = new Date(day);
-    shiftDay.setDate(day.getDate() + shift);
-    displayDay = shiftDay;
-    printDates(displayDay);
+<style>
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    font-family: Roboto, Helvetica, sans-serif;
+  }
+  html,
+  body {
+    height: 100%;
+    color: #404040;
+  }
+  table {
+    width: 80%;
+  }
+  table,
+  th,
+  td {
+    border: 1px solid #e0e0e0;
+    border-collapse: collapse;
   }
 
-  function getRelativeDate(day, shift) {
-    let shiftedDay = new Date(day.getTime() + 24 * shift * 60 * 60 * 1000);
-    return shiftedDay.getMonth() + 1 + "/" + shiftedDay.getDate();
+  .dark-bot {
+    border-bottom: 1px solid #404040;
+  }
+  .dark-right {
+    border-right: 1px solid #404040;
+  }
+  .white {
+    border-left: 1px solid white;
+    border-top: 1px solid white;
+  }
+  th,
+  td {
+    padding: 8px;
+  }
+  td {
+    background-color: #d8d8d8;
+  }
+  .header {
+    text-align: center;
+    padding: 1rem;
+  }
+  .hour {
+    background-color: white;
+  }
+  .open {
+    background-color: white;
+  }
+  .highlight {
+    background-color: blue;
   }
 
-  function printDates(date) {
-    const monday = document.getElementById("mon");
-    const tuesday = document.getElementById("tue");
-    const wednesday = document.getElementById("wed");
-    const thursday = document.getElementById("thu");
-    const friday = document.getElementById("fri");
-    const saturday = document.getElementById("sat");
-    const sunday = document.getElementById("sun");
-
-    switch (date.getDay()) {
-      case 0:
-        sunday.textContent = date.getMonth() + 1 + "/" + date.getDate();
-        monday.textContent = getRelativeDate(date, 1);
-        tuesday.textContent = getRelativeDate(date, 2);
-        wednesday.textContent = getRelativeDate(date, 3);
-        thursday.textContent = getRelativeDate(date, 4);
-        friday.textContent = getRelativeDate(date, 5);
-        saturday.textContent = getRelativeDate(date, 6);
-        break;
-      case 1:
-        sunday.textContent = getRelativeDate(date, -1);
-        monday.textContent = date.getMonth() + 1 + "/" + date.getDate();
-        tuesday.textContent = getRelativeDate(date, 1);
-        wednesday.textContent = getRelativeDate(date, 2);
-        thursday.textContent = getRelativeDate(date, 3);
-        friday.textContent = getRelativeDate(date, 4);
-        saturday.textContent = getRelativeDate(date, 5);
-        break;
-      case 2:
-        sunday.textContent = getRelativeDate(date, -2);
-        monday.textContent = getRelativeDate(date, -1);
-        tuesday.textContent = date.getMonth() + 1 + "/" + date.getDate();
-        wednesday.textContent = getRelativeDate(date, 1);
-        thursday.textContent = getRelativeDate(date, 2);
-        friday.textContent = getRelativeDate(date, 3);
-        saturday.textContent = getRelativeDate(date, 4);
-        break;
-      case 3:
-        sunday.textContent = getRelativeDate(date, -3);
-        monday.textContent = getRelativeDate(date, -2);
-        tuesday.textContent = getRelativeDate(date, -1);
-        wednesday.textContent = date.getMonth() + 1 + "/" + date.getDate();
-        thursday.textContent = getRelativeDate(date, 1);
-        friday.textContent = getRelativeDate(date, 2);
-        saturday.textContent = getRelativeDate(date, 3);
-        break;
-      case 4:
-        sunday.textContent = getRelativeDate(date, -4);
-        monday.textContent = getRelativeDate(date, -3);
-        tuesday.textContent = getRelativeDate(date, -2);
-        wednesday.textContent = getRelativeDate(date, -1);
-        thursday.textContent = date.getMonth() + 1 + "/" + date.getDate();
-        friday.textContent = getRelativeDate(date, 1);
-        saturday.textContent = getRelativeDate(date, 2);
-        break;
-      case 5:
-        sunday.textContent = getRelativeDate(date, -5);
-        monday.textContent = getRelativeDate(date, -4);
-        tuesday.textContent = getRelativeDate(date, -3);
-        wednesday.textContent = getRelativeDate(date, -2);
-        thursday.textContent = getRelativeDate(date, -1);
-        friday.textContent = date.getMonth() + 1 + "/" + date.getDate();
-        saturday.textContent = getRelativeDate(date, 1);
-        break;
-      case 6:
-        sunday.textContent = getRelativeDate(date, -6);
-        monday.textContent = getRelativeDate(date, -5);
-        tuesday.textContent = getRelativeDate(date, -4);
-        wednesday.textContent = getRelativeDate(date, -3);
-        thursday.textContent = getRelativeDate(date, -2);
-        friday.textContent = getRelativeDate(date, -1);
-        saturday.textContent = date.getMonth() + 1 + "/" + date.getDate();
-        break;
-    }
+  /* Fix the button on the left side of the page */
+  .open-btn {
+    display: flex;
+    justify-content: left;
   }
-
-  function printOneDay(dayOfWeek, availableTimes) {
-    switch (dayOfWeek) {
-      case 0:
-        for (let i = 0; i < availableTimes.length; i++) {
-          if (availableTimes[i] in mapping) {
-            let cell = document.getElementById(mapping[availableTimes[i]]);
-            let cell2 = document.getElementById(mapping[availableTimes[i]] + 1);
-            let cell3 = document.getElementById(mapping[availableTimes[i]] + 2);
-            let cell4 = document.getElementById(mapping[availableTimes[i]] + 3);
-
-            cell.classList.add("open");
-            cell2.classList.add("open");
-            cell3.classList.add("open");
-            cell4.classList.add("open");
-          }
-        }
-        break;
-      case 1:
-        for (let i = 0; i < availableTimes.length; i++) {
-          if (availableTimes[i] in mapping) {
-            let cell = document.getElementById(mapping[availableTimes[i]] + 40);
-            let cell2 = document.getElementById(
-              mapping[availableTimes[i]] + 41
-            );
-            let cell3 = document.getElementById(
-              mapping[availableTimes[i]] + 42
-            );
-            let cell4 = document.getElementById(
-              mapping[availableTimes[i]] + 43
-            );
-
-            cell.classList.add("open");
-            cell2.classList.add("open");
-            cell3.classList.add("open");
-            cell4.classList.add("open");
-          }
-        }
-        break;
-      case 2:
-        for (let i = 0; i < availableTimes.length; i++) {
-          if (availableTimes[i] in mapping) {
-            let cell = document.getElementById(mapping[availableTimes[i]] + 80);
-            let cell2 = document.getElementById(
-              mapping[availableTimes[i]] + 81
-            );
-            let cell3 = document.getElementById(
-              mapping[availableTimes[i]] + 82
-            );
-            let cell4 = document.getElementById(
-              mapping[availableTimes[i]] + 83
-            );
-
-            cell.classList.add("open");
-            cell2.classList.add("open");
-            cell3.classList.add("open");
-            cell4.classList.add("open");
-          }
-        }
-        break;
-      case 3:
-        for (let i = 0; i < availableTimes.length; i++) {
-          if (availableTimes[i] in mapping) {
-            let cell = document.getElementById(
-              mapping[availableTimes[i]] + 120
-            );
-            let cell2 = document.getElementById(
-              mapping[availableTimes[i]] + 121
-            );
-            let cell3 = document.getElementById(
-              mapping[availableTimes[i]] + 122
-            );
-            let cell4 = document.getElementById(
-              mapping[availableTimes[i]] + 123
-            );
-
-            cell.classList.add("open");
-            cell2.classList.add("open");
-            cell3.classList.add("open");
-            cell4.classList.add("open");
-          }
-        }
-        break;
-      case 4:
-        for (let i = 0; i < availableTimes.length; i++) {
-          if (availableTimes[i] in mapping) {
-            let cell = document.getElementById(
-              mapping[availableTimes[i]] + 160
-            );
-            let cell2 = document.getElementById(
-              mapping[availableTimes[i]] + 161
-            );
-            let cell3 = document.getElementById(
-              mapping[availableTimes[i]] + 162
-            );
-            let cell4 = document.getElementById(
-              mapping[availableTimes[i]] + 163
-            );
-
-            cell.classList.add("open");
-            cell2.classList.add("open");
-            cell3.classList.add("open");
-            cell4.classList.add("open");
-          }
-        }
-        break;
-      case 5:
-        for (let i = 0; i < availableTimes.length; i++) {
-          if (availableTimes[i] in mapping) {
-            let cell = document.getElementById(
-              mapping[availableTimes[i]] + 200
-            );
-            let cell2 = document.getElementById(
-              mapping[availableTimes[i]] + 201
-            );
-            let cell3 = document.getElementById(
-              mapping[availableTimes[i]] + 202
-            );
-            let cell4 = document.getElementById(
-              mapping[availableTimes[i]] + 203
-            );
-
-            cell.classList.add("open");
-            cell2.classList.add("open");
-            cell3.classList.add("open");
-            cell4.classList.add("open");
-          }
-        }
-        break;
-      case 6:
-        for (let i = 0; i < availableTimes.length; i++) {
-          if (availableTimes[i] in mapping) {
-            let cell = document.getElementById(mapping[availableTimes[i]] + 80);
-            let cell2 = document.getElementById(
-              mapping[availableTimes[i]] + 81
-            );
-            let cell3 = document.getElementById(
-              mapping[availableTimes[i]] + 82
-            );
-            let cell4 = document.getElementById(
-              mapping[availableTimes[i]] + 83
-            );
-
-            cell.classList.add("open");
-            cell2.classList.add("open");
-            cell3.classList.add("open");
-            cell4.classList.add("open");
-          }
-        }
-        break;
-    }
+  /* Style and fix the button on the page */
+  .open-button {
+    background-color: #1c87c9;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    opacity: 0.8;
+    position: fixed;
   }
-
-  function findMonday(days) {
-    for (let i = 0; i < days.length; i++) {
-      if (days[i].dayOfWeek == 1) {
-        return i;
-      }
-    }
+  /* Position the Popup form */
+  .login-popup {
+    position: relative;
+    text-align: center;
+    width: 100%;
   }
-
-  function printAvailability(calendarDays) {
-    globalCalendarDays = calendarDays;
-    let firstMonday = findMonday(calendarDays);
-
-    if (page === 0) {
-      let numLoops = 6 - calendarDays[0].dayOfWeek;
-      for (let i = 0; i < numLoops; i++) {
-        printOneDay(calendarDays[i].dayOfWeek, calendarDays[i].validStartTimes);
-      }
-    } else if (page < 0) {
-      grayCells();
-    } else if (page === 1) {
-      if (firstMonday === 0) {
-        firstMonday = 5;
-      }
-      for (let i = 0; i < 5; i++) {
-        printOneDay(
-          calendarDays[i + firstMonday].dayOfWeek,
-          calendarDays[i + firstMonday].validStartTimes
-        );
-      }
-    } else {
-      grayCells();
-    }
-    toggleCells();
+  /* Hide the Popup form */
+  .form-popup {
+    display: none;
+    position: fixed;
+    left: 45%;
+    top: 5%;
+    transform: translate(-45%, 5%);
+    border: 2px solid #666;
+    z-index: 9;
   }
-
-  function grayCells() {
-    const cells = document.querySelectorAll("td");
-    cells.forEach((cell) => {
-      cell.classList.remove("open");
-      cell.classList.remove("highlight");
-    });
+  /* Styles for the form container */
+  .form-container {
+    max-width: 300px;
+    padding: 20px;
+    background-color: #fff;
   }
-
-  function decimalToMinutes(number) {
-    let decimal = number - Math.floor(number);
-    if (decimal == 0) return number;
-    if (decimal == 0.5) return Math.floor(number) + ":30";
-    if (decimal == 0.25) return Math.floor(number) + ":15";
-    if (decimal == 0.75) return Math.floor(number) + ":45";
+  .form-popup {
+    background-color: #fff;
   }
-
-  function militaryToTwelveHour(militaryHour) {
-    console.log(militaryHour);
-    if (militaryHour > 13) {
-      let twelveHour = militaryHour - 12;
-      twelveHour = decimalToMinutes(twelveHour) + "pm";
-      return twelveHour;
-    } else if (militaryHour >= 12 && militaryHour < 13) {
-      let twelveHour = militaryHour;
-      twelveHour = decimalToMinutes(twelveHour) + "pm";
-      return twelveHour;
-    } else {
-      let twelveHour = militaryHour;
-      twelveHour = decimalToMinutes(twelveHour) + "am";
-      return twelveHour;
-    }
+  /* Full-width for input fields */
+  .form-container input[type="text"],
+  .form-container input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    margin: 5px 0 22px 0;
+    border: none;
+    background: #eee;
   }
-
-  function fillEventDetails(id) {
-    const monday = document.getElementById("mon");
-    const tuesday = document.getElementById("tue");
-    const wednesday = document.getElementById("wed");
-    const thursday = document.getElementById("thu");
-    const friday = document.getElementById("fri");
-    const saturday = document.getElementById("sat");
-    const sunday = document.getElementById("sun");
-
-    const eventDetails = document.getElementById("eventDetails");
-    const timeOfEvent = document.getElementById("eventTime");
-    let eventTime;
-
-    if (id < 40) {
-      eventDetails.textContent = "Sunday " + sunday.textContent;
-      for (time in mapping) {
-        if (mapping[time] == id) eventTime = time;
-      }
-      timeOfEvent.textContent =
-        militaryToTwelveHour(eventTime) +
-        "-" +
-        militaryToTwelveHour(parseFloat(eventTime) + 1);
-    } else if (id < 80) {
-      eventDetails.textContent = "Monday " + monday.textContent;
-      for (time in mapping) {
-        if (mapping[time] == id - 40) eventTime = time;
-      }
-      timeOfEvent.textContent =
-        militaryToTwelveHour(eventTime) +
-        "-" +
-        militaryToTwelveHour(parseFloat(eventTime) + 1);
-    } else if (id < 120) {
-      console.log("Tuesday");
-      eventDetails.textContent = "Tuesday " + tuesday.textContent;
-      for (time in mapping) {
-        if (mapping[time] == id - 80) eventTime = time;
-      }
-      timeOfEvent.textContent =
-        militaryToTwelveHour(eventTime) +
-        "-" +
-        militaryToTwelveHour(parseFloat(eventTime) + 1);
-    } else if (id < 160) {
-      eventDetails.textContent = "Wednesday " + wednesday.textContent;
-      for (time in mapping) {
-        if (mapping[time] == id - 120) eventTime = time;
-      }
-      timeOfEvent.textContent =
-        militaryToTwelveHour(eventTime) +
-        "-" +
-        militaryToTwelveHour(parseFloat(eventTime) + 1);
-    } else if (id < 200) {
-      eventDetails.textContent = "Thursday " + thursday.textContent;
-      for (time in mapping) {
-        if (mapping[time] == id - 160) eventTime = time;
-      }
-      timeOfEvent.textContent =
-        militaryToTwelveHour(eventTime) +
-        "-" +
-        militaryToTwelveHour(parseFloat(eventTime) + 1);
-    } else if (id < 240) {
-      eventDetails.textContent = "Friday " + friday.textContent;
-      for (time in mapping) {
-        if (mapping[time] == id - 200) eventTime = time;
-      }
-      timeOfEvent.textContent =
-        militaryToTwelveHour(eventTime) +
-        "-" +
-        militaryToTwelveHour(parseFloat(eventTime) + 1);
-    } else if (id < 280) {
-      eventDetails.textContent = "Saturday " + saturday.textContent;
-      for (time in mapping) {
-        if (mapping[time] == id - 240) eventTime = time;
-      }
-      timeOfEvent.textContent =
-        militaryToTwelveHour(eventTime) +
-        "-" +
-        militaryToTwelveHour(parseFloat(eventTime) + 1);
-    }
+  /* When the inputs get focus, do something */
+  .form-container input[type="text"]:focus,
+  .form-container input[type="password"]:focus {
+    background-color: #ddd;
+    outline: none;
   }
-
-  function toggleCells() {
-    const cells = document.querySelectorAll(".open");
-    cells.forEach((cell) => {
-      cell.addEventListener("click", () => {
-        if (cell.classList.contains("valid")) {
-          fillEventDetails(cell.id);
-          document.getElementById("popup-Form").style.display = "block";
-        }
-      });
-      cell.addEventListener("mouseover", () => {
-        let adjacentCell = document.getElementById(parseInt(cell.id) + 1);
-        let adjacentCell2 = document.getElementById(parseInt(cell.id) + 2);
-        let adjacentCell3 = document.getElementById(parseInt(cell.id) + 3);
-
-        if (
-          cell.classList.contains("open") &&
-          adjacentCell.classList.contains("open") &&
-          adjacentCell2.classList.contains("open") &&
-          adjacentCell3.classList.contains("open")
-        ) {
-          cell.classList.add("highlight");
-          cell.classList.add("valid");
-          adjacentCell.classList.add("highlight");
-          adjacentCell2.classList.add("highlight");
-          adjacentCell3.classList.add("highlight");
-        }
-      });
-      cell.addEventListener("mouseout", () => {
-        let adjacentCell = document.getElementById(parseInt(cell.id) + 1);
-        let adjacentCell2 = document.getElementById(parseInt(cell.id) + 2);
-        let adjacentCell3 = document.getElementById(parseInt(cell.id) + 3);
-        if (
-          cell.classList.contains("open") &&
-          adjacentCell.classList.contains("open") &&
-          adjacentCell2.classList.contains("open") &&
-          adjacentCell3.classList.contains("open")
-        ) {
-          cell.classList.remove("highlight");
-          adjacentCell.classList.remove("highlight");
-          adjacentCell2.classList.remove("highlight");
-          adjacentCell3.classList.remove("highlight");
-        }
-      });
-    });
+  /* Style submit/login button */
+  .form-popup .btn {
+    background-color: #8ebf42;
+    color: #fff;
+    padding: 12px 20px;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    margin-bottom: 10px;
+    opacity: 0.8;
   }
-
-  function closeForm() {
-    document.getElementById("popup-Form").style.display = "none";
+  /* Style cancel button */
+  .form-popup .cancel {
+    background-color: #cc0000;
   }
-</script>
+  /* Hover effects for buttons */
+  .form-container .btn:hover,
+  .open-button:hover {
+    opacity: 1;
+  }
+</style>

@@ -458,9 +458,12 @@
           <label for="online">Online</label><br />
           <input type="radio" id="powell" name="location" value="powell" />
           <label for="powell">Powell</label>
-          <button type="submit" class="btn">Confirm</button>
-          <button class="btn cancel" onclick="closeForm()">Cancel</button>
+          <button class="btn" style="display: none;"></button>
         </form>
+        <button id="submit" onclick="handleSubmission()" class="btn">
+          Confirm
+        </button>
+        <button class="btn cancel" onclick="closeForm()">Cancel</button>
       </div>
     </div>
     <?!= include("page-js"); ?>
