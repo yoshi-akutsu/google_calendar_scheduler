@@ -51,12 +51,10 @@
     background-color: blue;
   }
 
-  /* Fix the button on the left side of the page */
   .open-btn {
     display: flex;
     justify-content: left;
   }
-  /* Style and fix the button on the page */
   .open-button {
     background-color: #1c87c9;
     color: white;
@@ -67,13 +65,11 @@
     opacity: 0.8;
     position: fixed;
   }
-  /* Position the Popup form */
   .login-popup {
     position: relative;
     text-align: center;
     width: 100%;
   }
-  /* Hide the Popup form */
   .form-popup {
     display: none;
     position: fixed;
@@ -83,13 +79,14 @@
     border: 2px solid #666;
     z-index: 9;
   }
-  /* Styles for the form container */
   .form-container {
     max-width: 300px;
     padding: 20px;
     background-color: #fff;
   }
-  /* Full-width for input fields */
+  .form-popup {
+    background-color: #fff;
+  }
   .form-container input[type="text"],
   .form-container input[type="password"] {
     width: 100%;
@@ -98,14 +95,12 @@
     border: none;
     background: #eee;
   }
-  /* When the inputs get focus, do something */
   .form-container input[type="text"]:focus,
   .form-container input[type="password"]:focus {
     background-color: #ddd;
     outline: none;
   }
-  /* Style submit/login button */
-  .form-container .btn {
+  .form-popup .btn {
     background-color: #8ebf42;
     color: #fff;
     padding: 12px 20px;
@@ -115,11 +110,9 @@
     margin-bottom: 10px;
     opacity: 0.8;
   }
-  /* Style cancel button */
-  .form-container .cancel {
+  .form-popup .cancel {
     background-color: #cc0000;
   }
-  /* Hover effects for buttons */
   .form-container .btn:hover,
   .open-button:hover {
     opacity: 1;

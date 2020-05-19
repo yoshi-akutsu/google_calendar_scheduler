@@ -12,14 +12,20 @@
   </head>
   <body>
     <div class="container">
+      <div class="alert alert-primary" role="alert">
+        Please wait 15-20s while we get the available time slots.
+      </div>
+      <div class="alert alert-danger" role="alert" style="display: none;">
+        Event creation failed. Check your inputs.
+      </div>
+      <div class="alert alert-success" role="alert" style="display: none;">
+        Event successfully scheduled!
+      </div>
       <div class="header">
         <button id="prev">Prev</button>
         <button id="next">Next</button>
       </div>
       <div class="calendar-body">
-        <div class="alert alert-success" role="alert" style="display: none;">
-          Event successfully scheduled!
-        </div>
         <table>
           <thead>
             <tr>

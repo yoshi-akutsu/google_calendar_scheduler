@@ -19,6 +19,7 @@
   prev.addEventListener("click", () => {
     shiftDates(displayDay, -7);
     grayCells();
+
     page -= 1;
     printAvailability(globalCalendarDays);
   });
@@ -324,6 +325,9 @@
   }
 
   function printAvailability(calendarDays) {
+    const alertPrimary = document.querySelector(".alert-primary");
+    alertPrimary.style.display = "none";
+
     globalCalendarDays = calendarDays;
     let firstMonday = findMonday(calendarDays);
 
@@ -355,6 +359,7 @@
     cells.forEach((cell) => {
       cell.classList.remove("open");
       cell.classList.remove("highlight");
+      cell.classList.remove("valid");
     });
   }
 
@@ -573,10 +578,13 @@
       .createCalendarEvent(obj);
   }
   function handleFailure() {
-    console.log("event creation failed");
+    const alert = document.querySelector(".alert-danger");
+    alert.style.display = "block";
   }
 
   function handleSubmission() {
+    const alertDanger = document.querySelector(".alert-danger");
+    alertDanger.style.display = "none";
     document.getElementById("fullName").value = "";
     document.getElementById("email").value = "";
     document.getElementById("email2").value = "";
@@ -589,7 +597,10 @@
       }
     }
     closeForm();
-    const alert = document.querySelector(".alert");
+    const alert = document.querySelector(".alert-success");
     alert.style.display = "block";
+    grayCells();
+    document.getElementById("prev").disabled = true;
+    document.getElementById("next").disabled = true;
   }
 </script>
