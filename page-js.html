@@ -540,8 +540,9 @@
     let amPm;
 
     if (startEnd[0].length < 5) {
-      let amPm = startEnd[0].substr(-2, 2);
+      amPm = startEnd[0].substr(-2, 2);
       hour = startEnd[0].slice(0, startEnd[0].length - 2);
+      hour = parseInt(hour);
       minute = 0;
     } else {
       let hourMinute = startEnd[0].split(":");
@@ -559,11 +560,16 @@
     let month = monthDay[0] - 1;
     let day = monthDay[1];
 
-    //
-    // need to add year logic
-    //
-    let date = [2020, month, day, hour, minute];
+    let now = new Date();
+    let year = now.getFullYear();
+    if (month == 0 && now.getMonth() == 11) {
+      year += 1;
+    }
 
+    console.log(year);
+
+    let date = [year, month, day, hour, minute];
+    console.log(hour, " ", amPm);
     let obj = {
       name: name,
       email: email,
