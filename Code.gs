@@ -222,13 +222,39 @@ function main() {
   createDraft("akutsu.yoshi@gmail.com", getCalendarDays());
 }
 
+function fixFormatting(name) {
+  var array = name.split(" ");
+  if (array.length == 2) {
+    let firstName = array[0].split("");
+    let lastName = array[1].split("");
+    firstName[0] = firstName[0].toUpperCase();
+    lastName[0] = lastName[0].toUpperCase();
+    return firstName.join("") + " " + lastName.join("");
+  }
+  else if (array.length == 1){
+    let name = array[0].split("")
+    name[0] = name[0].toUpperCase();
+    return name.join("");
+  }
+  else {
+    return name;
+  }
+}
+
 function createCalendarEvent(obj) {
   let date = new Date(obj.date[0], obj.date[1], obj.date[2], obj.date[3]);
   let endDate = new Date(date);
   endDate.setHours(date.getHours() + 1);
   
-  let title = obj.location + obj.fullName;
-  Logger.log(date, endDate, title);
-  let event = CalendarApp.getDefaultCalendar().createEvent(title, date, endDate, {guests: obj.email, sendInvites: true});
+  let emails = obj.email;
+  if (obj.email2.length > 0) {
+    emails = emails + "," + obj.email2
+  }
+  if (obj.email3.length > 0) {
+    emails = emails + "," + obj.email3
+  }
+  
+  let title = fixFormatting(obj.location) + "- "+ fixFormatting(obj.firstName) + " " + fixFormatting(obj.lastName);
+  let event = CalendarApp.getDefaultCalendar().createEvent(title, date, endDate, {guests: emails, sendInvites: true});
 
 }
