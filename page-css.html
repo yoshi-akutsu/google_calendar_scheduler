@@ -10,8 +10,16 @@
     height: 100%;
     color: #404040;
   }
+  .container-fluid {
+    height: 100%;
+  }
+  .calendar-body {
+    text-align: center;
+  }
   table {
-    width: 80%;
+    width: 90%;
+    align: center;
+    height: 100%;
   }
   table,
   th,
@@ -30,9 +38,11 @@
     border-left: 1px solid white;
     border-top: 1px solid white;
   }
+
   th,
   td {
     padding: 8px;
+    width: 12.85%;
   }
   td {
     background-color: #d8d8d8;
@@ -43,14 +53,17 @@
   }
   .hour {
     background-color: white;
+    width: 10%;
   }
   .open {
     background-color: white;
   }
   .highlight {
-    background-color: blue;
+    background-color: #6767ff;
   }
-
+  .selected {
+    background-color: #3535ff;
+  }
   .open-btn {
     display: flex;
     justify-content: left;
@@ -74,13 +87,13 @@
     display: none;
     position: fixed;
     left: 45%;
-    top: 5%;
+    top: 0%;
     transform: translate(-45%, 5%);
     border: 2px solid #666;
     z-index: 9;
   }
   .form-container {
-    max-width: 300px;
+    max-width: 400px;
     padding: 20px;
     background-color: #fff;
   }
@@ -116,5 +129,11 @@
   .form-container .btn:hover,
   .open-button:hover {
     opacity: 1;
+  }
+
+  @media all and (max-width: 736px) {
+    body {
+      margin: 0;
+    }
   }
 </style>

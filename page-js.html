@@ -1,5 +1,4 @@
 <script>
-  // Need to clean this up
   let displayDay = new Date();
   printDates(displayDay);
   let page = 0;
@@ -11,6 +10,8 @@
 
   const next = document.getElementById("next");
   const prev = document.getElementById("prev");
+  document.getElementById("prev").disabled = true;
+  document.getElementById("next").disabled = true;
 
   const submit = document.getElementById("submit");
   submit.addEventListener("click", () => {
@@ -19,14 +20,17 @@
 
   prev.addEventListener("click", () => {
     shiftDates(displayDay, -7);
+    closeForm();
+    removeSelected();
     grayCells();
-
     page -= 1;
     printAvailability(globalCalendarDays);
   });
 
   next.addEventListener("click", () => {
     shiftDates(displayDay, 7);
+    closeForm();
+    removeSelected();
     grayCells();
     page += 1;
     printAvailability(globalCalendarDays);
@@ -353,6 +357,8 @@
       grayCells();
     }
     toggleCells();
+    document.getElementById("prev").disabled = false;
+    document.getElementById("next").disabled = false;
   }
 
   function grayCells() {
@@ -472,6 +478,16 @@
     cells.forEach((cell) => {
       cell.addEventListener("click", () => {
         if (cell.classList.contains("valid")) {
+          cells.forEach((cell) => {
+            cell.classList.remove("selected");
+          });
+          let adjacentCell = document.getElementById(parseInt(cell.id) + 1);
+          let adjacentCell2 = document.getElementById(parseInt(cell.id) + 2);
+          let adjacentCell3 = document.getElementById(parseInt(cell.id) + 3);
+          cell.classList.add("selected");
+          adjacentCell.classList.add("selected");
+          adjacentCell2.classList.add("selected");
+          adjacentCell3.classList.add("selected");
           fillEventDetails(cell.id);
           document.getElementById("popup-Form").style.display = "block";
         }
@@ -513,17 +529,23 @@
     });
   }
 
+  function removeSelected() {
+    const cells = document.querySelectorAll("td");
+    cells.forEach((cell) => {
+      cell.classList.remove("selected");
+    });
+  }
+
   function closeForm() {
     document.getElementById("popup-Form").style.display = "none";
+    removeSelected();
   }
 
   function makeEvent() {
     //
-    // Need to check input validity
-    //
     // Need to set locational availability
     //
-    //
+
     let firstName = document.getElementById("firstName").value;
     if (firstName.length < 1) return;
     let lastName = document.getElementById("lastName").value;

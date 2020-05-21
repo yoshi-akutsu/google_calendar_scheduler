@@ -242,6 +242,11 @@ function fixFormatting(name) {
 }
 
 function createCalendarEvent(obj) {
+
+  //
+  // Add addresses
+  //
+  
   let date = new Date(obj.date[0], obj.date[1], obj.date[2], obj.date[3]);
   let endDate = new Date(date);
   endDate.setHours(date.getHours() + 1);

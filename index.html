@@ -2,6 +2,7 @@
 <html>
   <head>
     <base target="_top" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <?!= include("page-css"); ?>
     <link
       rel="stylesheet"
@@ -11,7 +12,7 @@
     />
   </head>
   <body>
-    <div class="container">
+    <div class="container-fluid">
       <div class="alert alert-primary" role="alert">
         Please wait 15-20s while we get the available time slots.
       </div>
@@ -22,8 +23,8 @@
         Event successfully scheduled!
       </div>
       <div class="header">
-        <button id="prev">Prev</button>
-        <button id="next">Next</button>
+        <button class="btn btn-lg btn-dark" id="prev">Prev</button>
+        <button class="btn btn-lg btn-dark" id="next">Next</button>
       </div>
       <div class="calendar-body">
         <table>
@@ -451,21 +452,24 @@
 
           <label for="email"> <strong>E-mails: </strong><br /> </label><br />
           <input
-            type="email"
-            placeholder="student.name@email.com"
+            type="text"
+            placeholder="jane.doe@email.com"
             id="email"
+            size="30"
             required
           />
           <input
-            type="email"
-            placeholder="parent1.name@email.com"
+            type="text"
+            placeholder="john.doe@email.com"
             id="email2"
+            size="30"
           />
           <input
-            type="email"
-            placeholder="parent2.name@email.com"
+            type="text"
+            placeholder="doe.mama@email.com"
             id="email3"
-          /><br />
+            size="30"
+          />
 
           <br /><strong>Location: </strong><br />
           <input
@@ -480,7 +484,6 @@
           <label for="bethel">Bethel</label><br />
           <input type="radio" id="powell" name="location" value="powell" />
           <label for="powell">Powell</label>
-          <button class="btn" style="display: none;"></button>
         </form>
         <button id="submit" class="btn">Confirm</button>
         <button class="btn cancel" onclick="closeForm()">Cancel</button>
