@@ -174,13 +174,10 @@ function doesRangeMatchMeeting(time, meetingTimes) {
 // START CONTROLLER FUNCTIONS
 //
 
-function getOneDaysEvents(daysFromToday) {
-  let now = new Date();
-  let day = new Date(now.getTime() + ((24 * daysFromToday) * 60 * 60 * 1000));
-  let events = CalendarApp.getDefaultCalendar().getEventsForDay(day);
-  return { events: events, day: day };
+// Returns working location for the day
+function getLocationalAvailability() {
+  
 }
-
 
 // Gets meeting start time and length in hours
 function getMeetingTimes(daysEvents) {
@@ -253,6 +250,35 @@ function findHourSlots(calendarDay){
   return validStartTimes;
 }
 
+function getOneDaysEvents(daysFromToday) {
+  let now = new Date();
+  let day = new Date(now.getTime() + ((24 * daysFromToday) * 60 * 60 * 1000));
+  let events = CalendarApp.getDefaultCalendar().getEventsForDay(day);
+  return { events: events, day: day };
+}
+
+// Locational availability logic
+function getDaysLocation(eventsArray) {
+  let bethel = false;
+  let powell = false;
+  for (let i = 0; i < eventsArray.length; i++) {
+    if (eventsArray[i].getTitle().search("ethel") === -1) {
+      if (eventsArray[i].getTitle().search("owell") === -1) {
+        continue;
+      }
+      else {
+        powell = true;
+      }
+    }
+    else {
+      bethel = true;
+    }
+  }
+  
+  return {bethel: bethel, powell: powell};
+}
+
+// Gets calendar days for next 14 days
 function getCalendarDays() { 
   let calendarDays = [];
   // Number of days forward to look is defined here
@@ -272,9 +298,9 @@ function getCalendarDays() {
     let workHours = defineWorkHours(meetingTimes);
     calendarDay.openings = findOpenings(workHours, i);
     calendarDay.validStartTimes = findHourSlots(calendarDay);
+    calendarDay.location = getDaysLocation(events.events);
     delete calendarDay.openings;
-    calendarDays.push(calendarDay);
-    
+    calendarDays.push(calendarDay);  
   }
   // I now have a great calendar object with which to build out the calendar GUI
   return calendarDays; 
