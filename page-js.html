@@ -1,22 +1,24 @@
 <script>
-  let displayDay = new Date();
-  printDates(displayDay);
-  let page = 0;
-  google.script.run.withSuccessHandler(printAvailability).getCalendarDays();
-  toggleCells();
+  // *******************************************************************************
+  // START MAIN
+  //
 
+  // Global variables
+  let displayDay = new Date();
+  let page = 0;
   let globalCalendarDays;
   let globalMeetingTime;
 
+  // Initial DOM changes
+  google.script.run.withSuccessHandler(printAvailability).getCalendarDays();
+  toggleCells();
+  printDates(displayDay);
+
+  // Initializes next and prev buttons
   const next = document.getElementById("next");
   const prev = document.getElementById("prev");
   document.getElementById("prev").disabled = true;
   document.getElementById("next").disabled = true;
-
-  const submit = document.getElementById("submit");
-  submit.addEventListener("click", () => {
-    makeEvent();
-  });
 
   prev.addEventListener("click", () => {
     shiftDates(displayDay, -7);
@@ -35,6 +37,183 @@
     page += 1;
     printAvailability(globalCalendarDays);
   });
+
+  // Initializes submit button
+  const submit = document.getElementById("submit");
+  submit.addEventListener("click", () => {
+    makeEvent();
+  });
+
+  //
+  // END MAIN
+  // *******************************************************************************
+
+  // *******************************************************************************
+  // START HELPER FUNCTIONS
+  //
+
+  function decimalToMinutes(number) {
+    let decimal = number - Math.floor(number);
+    if (decimal == 0) return number;
+    if (decimal == 0.5) return Math.floor(number) + ":30";
+    if (decimal == 0.25) return Math.floor(number) + ":15";
+    if (decimal == 0.75) return Math.floor(number) + ":45";
+  }
+
+  function militaryToTwelveHour(militaryHour) {
+    if (militaryHour >= 13) {
+      let twelveHour = militaryHour - 12;
+      twelveHour = decimalToMinutes(twelveHour) + "pm";
+      return twelveHour;
+    } else if (militaryHour >= 12 && militaryHour < 13) {
+      let twelveHour = militaryHour;
+      twelveHour = decimalToMinutes(twelveHour) + "pm";
+      return twelveHour;
+    } else {
+      let twelveHour = militaryHour;
+      twelveHour = decimalToMinutes(twelveHour) + "am";
+      return twelveHour;
+    }
+  }
+
+  function shiftDates(day, shift) {
+    let shiftDay = new Date(day);
+    shiftDay.setDate(day.getDate() + shift);
+    displayDay = shiftDay;
+    printDates(displayDay);
+  }
+
+  function getRelativeDate(day, shift) {
+    let shiftedDay = new Date(day.getTime() + 24 * shift * 60 * 60 * 1000);
+    return shiftedDay.getMonth() + 1 + "/" + shiftedDay.getDate();
+  }
+
+  function findMonday(days) {
+    for (let i = 0; i < days.length; i++) {
+      if (days[i].dayOfWeek == 1) {
+        return i;
+      }
+    }
+  }
+
+  //
+  // END HELPER FUNCTIONS
+  // *******************************************************************************
+
+  // *******************************************************************************
+  // START CONTROLLER FUNCTIONS
+  //
+
+  function printAvailability(calendarDays) {
+    const alertPrimary = document.querySelector(".alert-primary");
+    alertPrimary.style.display = "none";
+
+    globalCalendarDays = calendarDays;
+    let firstMonday = findMonday(calendarDays);
+
+    if (page === 0) {
+      let numLoops = 6 - calendarDays[0].dayOfWeek;
+      for (let i = 0; i < numLoops; i++) {
+        printOneDay(calendarDays[i].dayOfWeek, calendarDays[i].validStartTimes);
+      }
+    } else if (page < 0) {
+      grayCells();
+    } else if (page === 1) {
+      if (firstMonday === 0) {
+        firstMonday = 5;
+      }
+      for (let i = 0; i < 5; i++) {
+        printOneDay(
+          calendarDays[i + firstMonday].dayOfWeek,
+          calendarDays[i + firstMonday].validStartTimes
+        );
+      }
+    } else {
+      grayCells();
+    }
+    toggleCells();
+    document.getElementById("prev").disabled = false;
+    document.getElementById("next").disabled = false;
+  }
+
+  function makeEvent() {
+    //
+    // Need to set locational availability
+    //
+
+    let firstName = document.getElementById("firstName").value;
+    if (firstName.length < 1) return;
+    let lastName = document.getElementById("lastName").value;
+    if (lastName.length < 1) return;
+    let email = document.getElementById("email").value;
+    if (email.length < 1) return;
+    let email2 = document.getElementById("email2").value;
+    let email3 = document.getElementById("email3").value;
+    let radios = document.getElementsByName("location");
+    let location;
+    for (let i = 0, length = radios.length; i < length; i++) {
+      if (radios[i].checked) {
+        location = radios[i].id;
+        console.log(location);
+        break;
+      }
+    }
+    if (location.length < 1) return;
+    let meetingTime = document.getElementById("eventTime").textContent;
+    let startEnd = meetingTime.split("-");
+    let hour;
+    let minute;
+    let amPm;
+
+    if (startEnd[0].length < 5) {
+      amPm = startEnd[0].substr(-2, 2);
+      hour = startEnd[0].slice(0, startEnd[0].length - 2);
+      hour = parseInt(hour);
+      minute = 0;
+    } else {
+      let hourMinute = startEnd[0].split(":");
+      amPm = hourMinute[1].substr(-2, 2);
+      minute = hourMinute[1].slice(0, hourMinute[1].length - 2);
+      hour = parseInt(hourMinute[0]);
+    }
+    if (amPm === "pm") {
+      hour += 12;
+    }
+
+    let meetingDetails = document.getElementById("eventDetails").textContent;
+    let meetingDay = meetingDetails.split(" ");
+    let monthDay = meetingDay[1].split("/");
+    let month = monthDay[0] - 1;
+    let day = monthDay[1];
+
+    let now = new Date();
+    let year = now.getFullYear();
+    if (month == 0 && now.getMonth() == 11) {
+      year += 1;
+    }
+    let date = [year, month, day, hour, minute];
+    let obj = {
+      firstName: firstName,
+      lastName: lastName,
+      email: email,
+      email2: email2,
+      email3: email3,
+      location: location,
+      date: date,
+    };
+    google.script.run
+      .withSuccessHandler(handleSubmission)
+      .withFailureHandler(handleFailure)
+      .createCalendarEvent(obj);
+  }
+
+  //
+  // END CONTROLLER FUNCTIONS
+  // *******************************************************************************
+
+  // *******************************************************************************
+  // START DOM CHANGING FUNCTIONS
+  //
 
   const mapping = {
     "10": 0,
@@ -79,20 +258,7 @@
     "19.75": 39,
   };
 
-  // Start functions
-
-  function shiftDates(day, shift) {
-    let shiftDay = new Date(day);
-    shiftDay.setDate(day.getDate() + shift);
-    displayDay = shiftDay;
-    printDates(displayDay);
-  }
-
-  function getRelativeDate(day, shift) {
-    let shiftedDay = new Date(day.getTime() + 24 * shift * 60 * 60 * 1000);
-    return shiftedDay.getMonth() + 1 + "/" + shiftedDay.getDate();
-  }
-
+  // Changes values of ths to show dates
   function printDates(date) {
     const monday = document.getElementById("mon");
     const tuesday = document.getElementById("tue");
@@ -169,6 +335,7 @@
     }
   }
 
+  // Changes classes of tds to show available times
   function printOneDay(dayOfWeek, availableTimes) {
     switch (dayOfWeek) {
       case 0:
@@ -321,79 +488,7 @@
     }
   }
 
-  function findMonday(days) {
-    for (let i = 0; i < days.length; i++) {
-      if (days[i].dayOfWeek == 1) {
-        return i;
-      }
-    }
-  }
-
-  function printAvailability(calendarDays) {
-    const alertPrimary = document.querySelector(".alert-primary");
-    alertPrimary.style.display = "none";
-
-    globalCalendarDays = calendarDays;
-    let firstMonday = findMonday(calendarDays);
-
-    if (page === 0) {
-      let numLoops = 6 - calendarDays[0].dayOfWeek;
-      for (let i = 0; i < numLoops; i++) {
-        printOneDay(calendarDays[i].dayOfWeek, calendarDays[i].validStartTimes);
-      }
-    } else if (page < 0) {
-      grayCells();
-    } else if (page === 1) {
-      if (firstMonday === 0) {
-        firstMonday = 5;
-      }
-      for (let i = 0; i < 5; i++) {
-        printOneDay(
-          calendarDays[i + firstMonday].dayOfWeek,
-          calendarDays[i + firstMonday].validStartTimes
-        );
-      }
-    } else {
-      grayCells();
-    }
-    toggleCells();
-    document.getElementById("prev").disabled = false;
-    document.getElementById("next").disabled = false;
-  }
-
-  function grayCells() {
-    const cells = document.querySelectorAll("td");
-    cells.forEach((cell) => {
-      cell.classList.remove("open");
-      cell.classList.remove("highlight");
-      cell.classList.remove("valid");
-    });
-  }
-
-  function decimalToMinutes(number) {
-    let decimal = number - Math.floor(number);
-    if (decimal == 0) return number;
-    if (decimal == 0.5) return Math.floor(number) + ":30";
-    if (decimal == 0.25) return Math.floor(number) + ":15";
-    if (decimal == 0.75) return Math.floor(number) + ":45";
-  }
-
-  function militaryToTwelveHour(militaryHour) {
-    if (militaryHour >= 13) {
-      let twelveHour = militaryHour - 12;
-      twelveHour = decimalToMinutes(twelveHour) + "pm";
-      return twelveHour;
-    } else if (militaryHour >= 12 && militaryHour < 13) {
-      let twelveHour = militaryHour;
-      twelveHour = decimalToMinutes(twelveHour) + "pm";
-      return twelveHour;
-    } else {
-      let twelveHour = militaryHour;
-      twelveHour = decimalToMinutes(twelveHour) + "am";
-      return twelveHour;
-    }
-  }
-
+  // Changes pop-up menu details
   function fillEventDetails(id) {
     const monday = document.getElementById("mon");
     const tuesday = document.getElementById("tue");
@@ -473,6 +568,7 @@
     }
   }
 
+  // Adds visual cues and selectability to tds
   function toggleCells() {
     const cells = document.querySelectorAll(".open");
     cells.forEach((cell) => {
@@ -529,98 +625,13 @@
     });
   }
 
-  function removeSelected() {
-    const cells = document.querySelectorAll("td");
-    cells.forEach((cell) => {
-      cell.classList.remove("selected");
-    });
-  }
-
-  function closeForm() {
-    document.getElementById("popup-Form").style.display = "none";
-    removeSelected();
-  }
-
-  function makeEvent() {
-    //
-    // Need to set locational availability
-    //
-
-    let firstName = document.getElementById("firstName").value;
-    if (firstName.length < 1) return;
-    let lastName = document.getElementById("lastName").value;
-    if (lastName.length < 1) return;
-    let email = document.getElementById("email").value;
-    if (email.length < 1) return;
-    let email2 = document.getElementById("email2").value;
-    let email3 = document.getElementById("email3").value;
-    let radios = document.getElementsByName("location");
-    let location;
-    for (let i = 0, length = radios.length; i < length; i++) {
-      if (radios[i].checked) {
-        location = radios[i].id;
-        console.log(location);
-        break;
-      }
-    }
-    if (location.length < 1) return;
-    let meetingTime = document.getElementById("eventTime").textContent;
-    // 11:45am-12:45pm
-    let startEnd = meetingTime.split("-");
-    let hour;
-    let minute;
-    let amPm;
-
-    if (startEnd[0].length < 5) {
-      amPm = startEnd[0].substr(-2, 2);
-      hour = startEnd[0].slice(0, startEnd[0].length - 2);
-      hour = parseInt(hour);
-      minute = 0;
-    } else {
-      let hourMinute = startEnd[0].split(":");
-      amPm = hourMinute[1].substr(-2, 2);
-      minute = hourMinute[1].slice(0, hourMinute[1].length - 2);
-      hour = parseInt(hourMinute[0]);
-    }
-    if (amPm === "pm") {
-      hour += 12;
-    }
-
-    let meetingDetails = document.getElementById("eventDetails").textContent;
-    let meetingDay = meetingDetails.split(" ");
-    let monthDay = meetingDay[1].split("/");
-    let month = monthDay[0] - 1;
-    let day = monthDay[1];
-
-    let now = new Date();
-    let year = now.getFullYear();
-    if (month == 0 && now.getMonth() == 11) {
-      year += 1;
-    }
-
-    console.log(year);
-
-    let date = [year, month, day, hour, minute];
-    console.log(hour, " ", amPm);
-    let obj = {
-      firstName: firstName,
-      lastName: lastName,
-      email: email,
-      email2: email2,
-      email3: email3,
-      location: location,
-      date: date,
-    };
-    google.script.run
-      .withSuccessHandler(handleSubmission)
-      .withFailureHandler(handleFailure)
-      .createCalendarEvent(obj);
-  }
+  // Alerts user when a Google Calendar Event could not be created
   function handleFailure() {
     const alert = document.querySelector(".alert-danger");
     alert.style.display = "block";
   }
 
+  // Locks the UI when a Google Calendar Event is successfully created
   function handleSubmission() {
     const alertDanger = document.querySelector(".alert-danger");
     alertDanger.style.display = "none";
@@ -643,4 +654,32 @@
     document.getElementById("prev").disabled = true;
     document.getElementById("next").disabled = true;
   }
+
+  // Rests tds
+  function grayCells() {
+    const cells = document.querySelectorAll("td");
+    cells.forEach((cell) => {
+      cell.classList.remove("open");
+      cell.classList.remove("highlight");
+      cell.classList.remove("valid");
+    });
+  }
+
+  // Removes visual cue for time selections
+  function removeSelected() {
+    const cells = document.querySelectorAll("td");
+    cells.forEach((cell) => {
+      cell.classList.remove("selected");
+    });
+  }
+
+  // Closes pop-up form
+  function closeForm() {
+    document.getElementById("popup-Form").style.display = "none";
+    removeSelected();
+  }
+
+  //
+  // END DOM CHANGING FUNCTIONS
+  // *******************************************************************************
 </script>

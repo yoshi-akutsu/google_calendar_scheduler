@@ -1,12 +1,178 @@
+// *******************************************************************************
+// START MAIN
+//
+
 // Allows separate html pages to be included
 function include(filename){
    return HtmlService.createHtmlOutputFromFile(filename).getContent();
 }
 
-// Gets html page
+// Initializes web app
 function doGet() {
   return HtmlService.createTemplateFromFile('index').evaluate();
 }
+
+function main() {
+  createDraft("yoshi@collegeliftoff.org", getCalendarDays());
+}
+
+// Creates email drafts
+function createDraft(email, calendarDays) {
+  let msg = "";
+  
+  for (let i = 0; i < calendarDays.length; i++) {
+    let month = calendarDays[i].month + 1;
+    let date = calendarDays[i].date;
+    let dayOfWeek = calendarDays[i].dayOfWeek;
+    let formattedSlots = formatSlots(calendarDays[i].validStartTimes);
+    
+    let oneDay = month + "/" + date + " (" + getDayOfWeekName(dayOfWeek) + "): " + formattedSlots + "\n";
+    msg += oneDay;
+  }
+  GmailApp.createDraft(email, "Rescheduling", msg);
+}
+
+function createCalendarEvent(obj) {
+  //
+  // Add addresses
+  //
+  
+  let date = new Date(obj.date[0], obj.date[1], obj.date[2], obj.date[3]);
+  let endDate = new Date(date);
+  endDate.setHours(date.getHours() + 1);
+  
+  let emails = obj.email;
+  if (obj.email2.length > 0) {
+    emails = emails + "," + obj.email2
+  }
+  if (obj.email3.length > 0) {
+    emails = emails + "," + obj.email3
+  }
+  
+  let title = fixFormatting(obj.location) + "- "+ fixFormatting(obj.firstName) + " " + fixFormatting(obj.lastName);
+  let event = CalendarApp.getDefaultCalendar().createEvent(title, date, endDate, {guests: emails, sendInvites: true});
+
+}
+
+// 
+// END MAIN
+// *******************************************************************************
+
+// *******************************************************************************
+// START HELPER FUNCTIONS
+//
+
+// Example input to output: 12:30 => 12.5
+function formatDate(date) {
+  let hours = date.getHours();
+  let minutes = date.getMinutes() / 60;
+  return hours + minutes;
+}
+
+function getDayOfWeekName(number) {
+  switch (number) {
+    case 0:
+      return "Sunday";
+    case 1:
+      return "Monday";
+    case 2:
+      return "Tuesday";
+    case 3:
+      return "Wednesday";
+    case 4:
+      return "Thursday";
+    case 5:
+      return "Friday";
+    case 6:
+      return "Saturday";
+  }
+}
+
+function decimalToMinutes(number) {
+  let decimal = number - Math.floor(number);
+  if (decimal == 0) return number;
+  if (decimal == 0.5) return (Math.floor(number) + ":30");
+  if (decimal == 0.25) return (Math.floor(number) + ":15");
+  if (decimal == 0.75) return (Math.floor(number) + ":45");
+}
+
+function militaryToTwelveHour(militaryHour) {
+  if (militaryHour > 12) {
+    let twelveHour = militaryHour - 12;
+    twelveHour = decimalToMinutes(twelveHour) + "pm";
+    return twelveHour;
+  }
+  else if (militaryHour == 12) {
+    let twelveHour = militaryHour;
+    twelveHour = decimalToMinutes(twelveHour) + "pm";
+    return twelveHour;
+  }
+  else {
+    let twelveHour = militaryHour;
+    twelveHour = decimalToMinutes(twelveHour) + "am";
+    return twelveHour;
+  }
+}
+
+function fixFormatting(name) {
+  var array = name.split(" ");
+  if (array.length == 2) {
+    let firstName = array[0].split("");
+    let lastName = array[1].split("");
+    firstName[0] = firstName[0].toUpperCase();
+    lastName[0] = lastName[0].toUpperCase();
+    return firstName.join("") + " " + lastName.join("");
+  }
+  else if (array.length == 1){
+    let name = array[0].split("")
+    name[0] = name[0].toUpperCase();
+    return name.join("");
+  }
+  else {
+    return name;
+  }
+}
+
+// Example input: [11.0, 11.25, 11.5, 11.75, 12.0, 12.25, 12.5, 12.75, 13.0, 13.25, 13.5, 13.75]
+function formatSlots(validStartTimes){
+  let formattedString = "";
+  for (let i = 0; i < validStartTimes.length; i++) {
+      if (i === 0) {
+        formattedString = formattedString + militaryToTwelveHour(validStartTimes[0]);
+        formattedString = formattedString + "-";
+      }
+      if (validStartTimes[i + 1] - validStartTimes[i] != 0.25) {
+        if (i !== validStartTimes.length - 1) {
+          formattedString = formattedString + militaryToTwelveHour((validStartTimes[i] + 1));
+          formattedString = formattedString + ", " + militaryToTwelveHour(validStartTimes[i + 1]) + "-";  
+        }
+        else {
+          formattedString = formattedString + militaryToTwelveHour((validStartTimes[i] + 1));
+        }
+      }
+  }
+  return formattedString;
+}
+
+function doesRangeMatchMeeting(time, meetingTimes) {
+  for (let i = 0; i < meetingTimes.length; i++) {
+    for (let j = meetingTimes[i].startTime; j < meetingTimes[i].startTime + meetingTimes[i].lengthTime; j += 0.25) {
+      if (time === j) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+// 
+// END HELPER FUNCTIONS
+// *******************************************************************************
+  
+
+// *******************************************************************************
+// START CONTROLLER FUNCTIONS
+//
 
 function getOneDaysEvents(daysFromToday) {
   let now = new Date();
@@ -15,12 +181,6 @@ function getOneDaysEvents(daysFromToday) {
   return { events: events, day: day };
 }
 
-// Example input to output: 12:30 => 12.5
-function formatDate(date) {
-  let hours = date.getHours();
-  let minutes = date.getMinutes() / 60;
-  return hours + minutes;
-}
 
 // Gets meeting start time and length in hours
 function getMeetingTimes(daysEvents) {
@@ -64,17 +224,6 @@ function defineWorkHours(meetingTimes) {
   return range;
 }
 
-function doesRangeMatchMeeting(time, meetingTimes) {
-  for (let i = 0; i < meetingTimes.length; i++) {
-    for (let j = meetingTimes[i].startTime; j < meetingTimes[i].startTime + meetingTimes[i].lengthTime; j += 0.25) {
-      if (time === j) {
-        return true;
-      }
-    }
-  }
-  return false;
-}
-
 // Finds where there is not overlap between range and meeting range for one day
 function findOpenings(range, day) {
   let openings = [];
@@ -87,25 +236,6 @@ function findOpenings(range, day) {
     }     
   }
   return openings;
-}
-
-function getDayOfWeekName(number) {
-  switch (number) {
-    case 0:
-      return "Sunday";
-    case 1:
-      return "Monday";
-    case 2:
-      return "Tuesday";
-    case 3:
-      return "Wednesday";
-    case 4:
-      return "Thursday";
-    case 5:
-      return "Friday";
-    case 6:
-      return "Saturday";
-  }
 }
 
 // Sample input: { month: 11.0, dayOfWeek: 3.0, date: 18.0, openings: [11.0, 11.25, 11.5, 11.75, 12.0, 12.25, 12.5, 12.75, 13.0, 13.25, 13.5, 13.75] }
@@ -122,11 +252,6 @@ function findHourSlots(calendarDay){
   }
   return validStartTimes;
 }
-
-function getNumberOfDaysForward() {
-  
-}
-
 
 function getCalendarDays() { 
   let calendarDays = [];
@@ -155,111 +280,6 @@ function getCalendarDays() {
   return calendarDays; 
 }
 
-function decimalToMinutes(number) {
-  let decimal = number - Math.floor(number);
-  if (decimal == 0) return number;
-  if (decimal == 0.5) return (Math.floor(number) + ":30");
-  if (decimal == 0.25) return (Math.floor(number) + ":15");
-  if (decimal == 0.75) return (Math.floor(number) + ":45");
-}
-
-function militaryToTwelveHour(militaryHour) {
-  if (militaryHour > 12) {
-    let twelveHour = militaryHour - 12;
-    twelveHour = decimalToMinutes(twelveHour) + "pm";
-    return twelveHour;
-  }
-  else if (militaryHour == 12) {
-    let twelveHour = militaryHour;
-    twelveHour = decimalToMinutes(twelveHour) + "pm";
-    return twelveHour;
-  }
-  else {
-    let twelveHour = militaryHour;
-    twelveHour = decimalToMinutes(twelveHour) + "am";
-    return twelveHour;
-  }
-}
-
-// Example input: [11.0, 11.25, 11.5, 11.75, 12.0, 12.25, 12.5, 12.75, 13.0, 13.25, 13.5, 13.75]
-function formatSlots(validStartTimes){
-  let formattedString = "";
-  for (let i = 0; i < validStartTimes.length; i++) {
-      if (i === 0) {
-        formattedString = formattedString + militaryToTwelveHour(validStartTimes[0]);
-        formattedString = formattedString + "-";
-      }
-      if (validStartTimes[i + 1] - validStartTimes[i] != 0.25) {
-        if (i !== validStartTimes.length - 1) {
-          formattedString = formattedString + militaryToTwelveHour((validStartTimes[i] + 1));
-          formattedString = formattedString + ", " + militaryToTwelveHour(validStartTimes[i + 1]) + "-";  
-        }
-        else {
-          formattedString = formattedString + militaryToTwelveHour((validStartTimes[i] + 1));
-        }
-      }
-  }
-  return formattedString;
-}
-
-// Creates email drafts, ccing the appropriate parties
-function createDraft(email, calendarDays) {
-  let msg = "";
-  
-  for (let i = 0; i < calendarDays.length; i++) {
-    let month = calendarDays[i].month + 1;
-    let date = calendarDays[i].date;
-    let dayOfWeek = calendarDays[i].dayOfWeek;
-    let formattedSlots = formatSlots(calendarDays[i].validStartTimes);
-    
-    let oneDay = month + "/" + date + " (" + getDayOfWeekName(dayOfWeek) + "): " + formattedSlots + "\n";
-    msg += oneDay;
-  }
-  GmailApp.createDraft(email, "Rescheduling", msg);
-}
-
-function main() {
-  createDraft("akutsu.yoshi@gmail.com", getCalendarDays());
-}
-
-function fixFormatting(name) {
-  var array = name.split(" ");
-  if (array.length == 2) {
-    let firstName = array[0].split("");
-    let lastName = array[1].split("");
-    firstName[0] = firstName[0].toUpperCase();
-    lastName[0] = lastName[0].toUpperCase();
-    return firstName.join("") + " " + lastName.join("");
-  }
-  else if (array.length == 1){
-    let name = array[0].split("")
-    name[0] = name[0].toUpperCase();
-    return name.join("");
-  }
-  else {
-    return name;
-  }
-}
-
-function createCalendarEvent(obj) {
-
-  //
-  // Add addresses
-  //
-  
-  let date = new Date(obj.date[0], obj.date[1], obj.date[2], obj.date[3]);
-  let endDate = new Date(date);
-  endDate.setHours(date.getHours() + 1);
-  
-  let emails = obj.email;
-  if (obj.email2.length > 0) {
-    emails = emails + "," + obj.email2
-  }
-  if (obj.email3.length > 0) {
-    emails = emails + "," + obj.email3
-  }
-  
-  let title = fixFormatting(obj.location) + "- "+ fixFormatting(obj.firstName) + " " + fixFormatting(obj.lastName);
-  let event = CalendarApp.getDefaultCalendar().createEvent(title, date, endDate, {guests: emails, sendInvites: true});
-
-}
+//
+// END CONTROLLER FUNCTIONS
+// *******************************************************************************
