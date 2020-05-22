@@ -24,19 +24,22 @@
   table,
   th,
   td {
-    border: 1px solid #e0e0e0;
+    border: 1px solid #e8e8e8;
     border-collapse: collapse;
   }
-
-  .dark-bot {
-    border-bottom: 1px solid #404040;
+  .grayLabel {
+    color: #d3d3d3;
   }
+
   .dark-right {
-    border-right: 1px solid #404040;
+    border-right: 1px solid #505050;
   }
   .white {
     border-left: 1px solid white;
     border-top: 1px solid white;
+  }
+  .dark-bot {
+    border-bottom: 1px solid #989898;
   }
 
   th,
@@ -45,12 +48,13 @@
     width: 12.85%;
   }
   td {
-    background-color: #d8d8d8;
+    background-color: #e0e0e0;
   }
   .header {
     text-align: center;
     padding: 1rem;
   }
+
   .hour {
     background-color: white;
     width: 10%;
@@ -63,15 +67,19 @@
   }
   .bethel {
     background-color: #d0eaef;
+    color: #d0eaef;
   }
   .powell {
     background-color: #efd5d0;
+    color: #efd5d0;
   }
   .anywhere {
     background-color: #d5d0ef;
+    color: #d5d0ef;
   }
   .online {
     background-color: #eaefd0;
+    color: #eaefd0;
   }
   .highlight {
     background-color: #6767ff;
@@ -142,10 +150,19 @@
   .open-button:hover {
     opacity: 1;
   }
+  dl {
+    float: right;
+    width: 300px;
+    background: #fff;
+    border: 1px solid #e8e8e8;
+    padding: 5px 15px;
+    display: inline-block;
+    margin-right: 15%;
+  }
 
-  @media all and (max-width: 736px) {
-    body {
-      margin: 0;
-    }
+  dt,
+  dd {
+    display: inline;
+    width: 12px;
   }
 </style>

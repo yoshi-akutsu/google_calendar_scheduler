@@ -115,6 +115,10 @@
       let numLoops = 6 - calendarDays[0].dayOfWeek;
       for (let i = 0; i < numLoops; i++) {
         printOneDay(calendarDays[i].dayOfWeek, calendarDays[i].validStartTimes);
+        printLocationalAvailability(
+          calendarDays[i].location,
+          calendarDays[i].dayOfWeek
+        );
       }
     } else if (page < 0) {
       grayCells();
@@ -127,6 +131,10 @@
           calendarDays[i + firstMonday].dayOfWeek,
           calendarDays[i + firstMonday].validStartTimes
         );
+        printLocationalAvailability(
+          calendarDays[i + firstMonday].location,
+          calendarDays[i + firstMonday].dayOfWeek
+        );
       }
     } else {
       grayCells();
@@ -137,10 +145,6 @@
   }
 
   function makeEvent() {
-    //
-    // Need to set locational availability
-    //
-
     let firstName = document.getElementById("firstName").value;
     if (firstName.length < 1) return;
     let lastName = document.getElementById("lastName").value;
@@ -488,6 +492,76 @@
     }
   }
 
+  function printLocationalAvailability(locationObject, dayOfWeek) {
+    let location;
+    if (locationObject.bethel === true && locationObject.powell === false) {
+      location = "bethel";
+    }
+    if (locationObject.bethel === false && locationObject.powell === true) {
+      location = "powell";
+    }
+    if (locationObject.bethel === true && locationObject.powell === true) {
+      location = "online";
+    }
+    if (locationObject.bethel === false && locationObject.powell === false) {
+      location = "anywhere";
+    }
+    switch (dayOfWeek) {
+      case 0:
+        for (let i = 0; i < 40; i++) {
+          if (document.getElementById(i).classList.contains("open")) {
+            document.getElementById(i).classList.add(location);
+          }
+        }
+        break;
+      case 1:
+        for (let i = 40; i < 80; i++) {
+          if (document.getElementById(i).classList.contains("open")) {
+            document.getElementById(i).classList.add(location);
+          }
+        }
+
+        break;
+      case 2:
+        for (let i = 80; i < 120; i++) {
+          if (document.getElementById(i).classList.contains("open")) {
+            document.getElementById(i).classList.add(location);
+          }
+        }
+
+        break;
+      case 3:
+        for (let i = 120; i < 160; i++) {
+          if (document.getElementById(i).classList.contains("open")) {
+            document.getElementById(i).classList.add(location);
+          }
+        }
+
+        break;
+      case 4:
+        for (let i = 160; i < 200; i++) {
+          if (document.getElementById(i).classList.contains("open")) {
+            document.getElementById(i).classList.add(location);
+          }
+        }
+        break;
+      case 5:
+        for (let i = 200; i < 240; i++) {
+          if (document.getElementById(i).classList.contains("open")) {
+            document.getElementById(i).classList.add(location);
+          }
+        }
+        break;
+      case 6:
+        for (let i = 240; i < 280; i++) {
+          if (document.getElementById(i).classList.contains("open")) {
+            document.getElementById(i).classList.add(location);
+          }
+        }
+        break;
+    }
+  }
+
   // Changes pop-up menu details
   function fillEventDetails(id) {
     const monday = document.getElementById("mon");
@@ -573,6 +647,43 @@
     const cells = document.querySelectorAll(".open");
     cells.forEach((cell) => {
       cell.addEventListener("click", () => {
+        let bethel = document.getElementById("bethel");
+        let powell = document.getElementById("powell");
+        let online = document.getElementById("hangout");
+
+        let labels = document.getElementsByTagName("LABEL");
+        for (let i = 0; i < labels.length; i++) {
+          if (labels[i].htmlFor != "") {
+            let elem = document.getElementById(labels[i].htmlFor);
+            if (elem) elem.label = labels[i];
+          }
+        }
+
+        online.checked = true;
+        bethel.label.classList.remove("grayLabel");
+        powell.label.classList.remove("grayLabel");
+
+        if (cell.classList.contains("bethel")) {
+          powell.disabled = true;
+          powell.label.classList.add("grayLabel");
+          bethel.disabled = false;
+        }
+        if (cell.classList.contains("powell")) {
+          bethel.disabled = true;
+          bethel.label.classList.add("grayLabel");
+          powell.disabled = false;
+        }
+        if (cell.classList.contains("online")) {
+          powell.disabled = true;
+          powell.label.classList.add("grayLabel");
+          bethel.disabled = true;
+          bethel.label.classList.add("grayLabel");
+        }
+        if (cell.classList.contains("anywhere")) {
+          powell.disabled = false;
+          bethel.disabled = false;
+        }
+
         if (cell.classList.contains("valid")) {
           cells.forEach((cell) => {
             cell.classList.remove("selected");
@@ -655,13 +766,17 @@
     document.getElementById("next").disabled = true;
   }
 
-  // Rests tds
+  // Resets tds
   function grayCells() {
     const cells = document.querySelectorAll("td");
     cells.forEach((cell) => {
       cell.classList.remove("open");
       cell.classList.remove("highlight");
       cell.classList.remove("valid");
+      cell.classList.remove("bethel");
+      cell.classList.remove("powell");
+      cell.classList.remove("anywhere");
+      cell.classList.remove("online");
     });
   }
 
