@@ -1,6 +1,14 @@
+// Changes needed
+// -Automatically finding team meetings
+
 // *******************************************************************************
 // START MAIN
 //
+
+// Variables to change: 
+let onlineOnly = true;
+let daysForward = 21;
+let latestFriday = 17;
 
 // Allows separate html pages to be included
 function include(filename){
@@ -12,7 +20,7 @@ function doGet() {
   return HtmlService.createTemplateFromFile('index').evaluate();
 }
 
-function main() {
+function draftAvailabilityEmail() {
   createDraft("yoshi@collegeliftoff.org", getCalendarDays());
 }
 
@@ -151,7 +159,7 @@ function formatSlots(validStartTimes){
         }
       }
   }
-  return formattedString;
+  return formattedString + " ET";
 }
 
 function doesRangeMatchMeeting(time, meetingTimes) {
@@ -242,7 +250,14 @@ function findHourSlots(calendarDay){
     if (calendarDay.openings[i] + 0.25 == calendarDay.openings[i + 1]) {
       if (calendarDay.openings[i] + 0.50 == calendarDay.openings[i + 2]) {
         if (calendarDay.openings[i] + 0.75 == calendarDay.openings[i + 3]) {
-          validStartTimes.push(calendarDay.openings[i]);
+          if (calendarDay.dayOfWeek != 5) {
+            validStartTimes.push(calendarDay.openings[i]);
+          }
+          else {
+            if (calendarDay.openings[i] <= latestFriday) {
+              validStartTimes.push(calendarDay.openings[i]);
+            }
+          }
         }
       }
     }
@@ -274,15 +289,19 @@ function getDaysLocation(eventsArray) {
       bethel = true;
     }
   }
+  if (onlineOnly === true) {
+    return {bethel: true, powell: true};
+  }
   
   return {bethel: bethel, powell: powell};
+
 }
 
-// Gets calendar days for next 14 days
+// Gets calendar days for next 21 days
 function getCalendarDays() { 
   let calendarDays = [];
   // Number of days forward to look is defined here
-  for (let i = 0; i < 14; i++) {
+  for (let i = 0; i < daysForward; i++) {
     let calendarDay = {};
 
     let events = getOneDaysEvents(i);

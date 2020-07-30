@@ -122,11 +122,18 @@
       }
     } else if (page < 0) {
       grayCells();
-    } else if (page === 1) {
+    } else if (page >= 1) {
       if (firstMonday === 0) {
         firstMonday = 5;
       }
+      console.log(firstMonday);
       for (let i = 0; i < 5; i++) {
+        if (firstMonday !== 0 && i < 1 && page > 1) {
+          firstMonday += 5 * (page - 1);
+        }
+        if (calendarDays.length < 5 + firstMonday) {
+          break;
+        }
         printOneDay(
           calendarDays[i + firstMonday].dayOfWeek,
           calendarDays[i + firstMonday].validStartTimes
