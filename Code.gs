@@ -1,5 +1,5 @@
 // Changes needed
-// -Automatically finding team meetings
+// -Automatically finding team meetings -- if it has client planning in the name or team meeting
 
 // *******************************************************************************
 // START MAIN
@@ -269,6 +269,15 @@ function getOneDaysEvents(daysFromToday) {
   let now = new Date();
   let day = new Date(now.getTime() + ((24 * daysFromToday) * 60 * 60 * 1000));
   let events = CalendarApp.getDefaultCalendar().getEventsForDay(day);
+  
+  let teamEvents = CalendarApp.getCalendarById("collegeliftoff.org_t5ha6hmrg9tsgal01g1j0ocsao@group.calendar.google.com").getEventsForDay(day);
+  if (teamEvents) {
+    for (let i = 0; i < teamEvents.length; i++) {
+      if (teamEvents[i].getTitle().includes("Client Planning") || teamEvents[i].getTitle().includes("CL Team")) {
+        events.push(teamEvents[i]);
+      }
+    }
+  } 
   return { events: events, day: day };
 }
 
